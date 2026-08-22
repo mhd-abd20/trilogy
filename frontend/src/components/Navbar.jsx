@@ -47,12 +47,12 @@ useEffect(()=>{
   }, []);
 
   const userId = localStorage.getItem('userId');
-
+  const name = user.name.split(" ")[0]
   return (
     <nav className="navbar">
       <div className="navbar-container">
         {user?.name && (
-          <p className="user-welcome">مرحباً {user.name}</p>
+          <p className="user-welcome">مرحباً {name}</p>
         )}
         <Link to="/" className="logo">
           Trilogy
