@@ -50,7 +50,7 @@ useEffect(()=>{
   return (
     <nav className="navbar">
       <div className="navbar-container">
-        <p>{user.name}  </p>
+        <p>{user.name} مرحبا  </p>
         <Link to="/" className="logo">
           Trilogy
         </Link>
