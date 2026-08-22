@@ -15,6 +15,7 @@ const Navbar = () => {
   const id = localStorage.getItem('userId')
 
   const getName = async () => {
+    if(!id) return;
     try {
       const res = await axios.get(`${SERVER_ORIGIN}/api/users/${id}`);
       setUser(res.data)
@@ -25,7 +26,7 @@ const Navbar = () => {
   }
 useEffect(()=>{
   getName()
-},[])
+},[id])
 
   const updateCartCount = () => {
     const savedCart = JSON.parse(localStorage.getItem('trilogy_cart') || '[]');
@@ -50,7 +51,9 @@ useEffect(()=>{
   return (
     <nav className="navbar">
       <div className="navbar-container">
-        <p>{user.name} مرحبا  </p>
+        {user?.name && (
+          <p className="user-welcome">مرحباً {user.name}</p>
+        )}
         <Link to="/" className="logo">
           Trilogy
         </Link>
