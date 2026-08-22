@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getCategories, createCategory, updateCategory } from '../../api/categoryService';
 import '../../styles/CategoriesList.css';
-
+const SERVER_ORIGIN = import.meta.env.VITE_BACKEND_URL;
 function CategoriesList() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -68,7 +68,7 @@ function CategoriesList() {
   return (
     <div className="admin-page-wrapper">
       
-      {/* الهيدر العلوي */}
+      
       <div className="admin-header">
         <div className="admin-title-group">
           <h2>إدارة الفئات والمخزون</h2>

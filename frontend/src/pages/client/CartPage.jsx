@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../../styles/CartPage.css';
-
+const SERVER_ORIGIN = import.meta.env.VITE_BACKEND_URL;
 const CartPage = () => {
   const [cart, setCart] = useState(() => {
     const saved = localStorage.getItem('trilogy_cart');
@@ -32,7 +32,7 @@ const CartPage = () => {
     })
   }
 
-  const SERVER_ORIGIN = process.env.REACT_APP_BACKEND_URL;
+ 
   const getImageUrl = (imagePath) => {
     if (!imagePath) return '';
     if (
@@ -91,7 +91,7 @@ const CartPage = () => {
         totalAmount: totalPrice,
       };
 
-      await axios.post('http://localhost:8080/api/orders/checkout', payload);
+      await axios.post(`${SERVER_ORIGIN}/api/orders/checkout`, payload);
 
       alert('تم إرسال الطلب بنجاح وتحديث المخزون!');
       setCart([]);

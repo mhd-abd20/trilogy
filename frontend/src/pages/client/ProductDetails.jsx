@@ -12,13 +12,13 @@ const ProductDetails = () => {
   const [error, setError] = useState(null);
   const [quantity, setQuantity] = useState(1);
 
-  const SERVER_ORIGIN = 'http://localhost:8080';
+const SERVER_ORIGIN = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     const fetchProductDetails = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(`http://localhost:8080/api/products/${id}`);
+        const res = await axios.get(`${SERVER_ORIGIN}/api/products/${id}`);
         setProduct(res.data);
       } catch (err) {
         console.error("خطأ في جلب تفاصيل المنتج:", err);

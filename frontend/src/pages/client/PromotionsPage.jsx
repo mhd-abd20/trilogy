@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import '../../styles/promotionsPage.css'; 
-
+const SERVER_ORIGIN = import.meta.env.VITE_BACKEND_URL;
 const PromotionsPage = () => {
   const [promotions, setPromotions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -11,8 +11,7 @@ const PromotionsPage = () => {
     const fetchPromotions = async () => {
       try {
         setLoading(true);
-        // استدعاء العروض الفعالة فقط
-        const res = await axios.get('http://localhost:8080/api/promotions/active');
+        const res = await axios.get(`${SERVER_ORIGIN}/api/promotions/active`);
         setPromotions(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
         console.error('خطأ في جلب العروض:', err);

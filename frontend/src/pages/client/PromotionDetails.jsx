@@ -7,7 +7,7 @@ const PromotionDetails = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const SERVER_ORIGIN = 'http://localhost:8080';
+  const SERVER_ORIGIN = import.meta.env.VITE_BACKEND_URL;
   const getImageUrl = (imagePath) => {
     if (!imagePath) return '';
     if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
@@ -21,8 +21,8 @@ const PromotionDetails = () => {
     const fetchPromoProducts = async () => {
       try {
         setLoading(true);
-        // استدعاء الـ API الثاني المجهز بـ Backend الادمن
-        const res = await axios.get(`http://localhost:8080/api/promotions/${id}`);
+       
+        const res = await axios.get(`${SERVER_ORIGIN}/api/promotions/${id}`);
         setProducts(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
         console.error('خطأ في جلب منتجات العرض:', err);

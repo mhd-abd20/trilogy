@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import '../../styles/products.css';
-
+const SERVER_ORIGIN = import.meta.env.VITE_BACKEND_URL;
 const Products = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -20,10 +20,10 @@ const Products = () => {
       try {
         setLoading(true);
         const [prodRes, catRes] = await Promise.all([
-          axios.get('http://localhost:8080/api/products'),
-          axios.get('http://localhost:8080/api/categories')
+          axios.get(`${SERVER_ORIGIN}/api/products`),
+          axios.get(`${SERVER_ORIGIN}/api/categories`)
         ]);
-
+        
         setProducts(Array.isArray(prodRes.data) ? prodRes.data : []);
         setCategories(Array.isArray(catRes.data) ? catRes.data : []);
       } catch (err) {
@@ -43,7 +43,6 @@ const Products = () => {
     window.dispatchEvent(new Event('cartUpdated'));
   }, [cart]);
 
-  const SERVER_ORIGIN = 'http://localhost:8080';
   const getImageUrl = (imagePath) => {
     if (!imagePath) return '';
     if (

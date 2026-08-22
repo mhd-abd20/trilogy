@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { login } from '../../api/fetchlogin';
 import '../../styles/login.css'; 
-
+const SERVER_ORIGIN = import.meta.env.VITE_BACKEND_URL;
 const LoginPage = () => {
   const navigate = useNavigate();
   const [data, setData] = useState({
@@ -16,7 +16,6 @@ const LoginPage = () => {
     setError('');
     try {
       const res = await login(data.email, data.password);
-     
       localStorage.setItem('userId', res.user.id);
       localStorage.setItem('userRole', res.user.role);
       if(localStorage.getItem('userRole')=="admin"){

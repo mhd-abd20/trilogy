@@ -1,5 +1,5 @@
-const BASE_URL = 'http://localhost:8080/api';
-
+const raw = import.meta.env.VITE_BACKEND_URL;
+const SERVER_ORIGIN = `${raw}/api`
 export const customFetch = async (endpoint, options = {}) => {
   const defaultHeaders = {};
 
@@ -19,11 +19,10 @@ export const customFetch = async (endpoint, options = {}) => {
     delete config.headers['Content-Type'];
   }
 
-  const response = await fetch(`${BASE_URL}${endpoint}`, config);
+  const response = await fetch(`${SERVER_ORIGIN}${endpoint}`, config);
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    // التعديل هنا: الفحص عن message أو error
     throw new Error(errorData.message || errorData.error || 'حدث خطأ في الطلب');
   }
 
