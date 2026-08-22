@@ -1,0 +1,344 @@
+
+
+/* =========================================
+   1. المتغيرات والأساسيات (مطابقة لـ AdminCategories)
+   ========================================= */
+:root {
+  --admin-bg-page: #0f172a;       /* Slate 900 */
+  --admin-bg-card: #1e293b;       /* Slate 800 */
+  --admin-bg-hover: #334155;      /* Slate 700 */
+  --admin-border: rgba(255, 255, 255, 0.08);
+
+  --admin-text-main: #f8fafc;
+  --admin-text-sub: #94a3b8;
+  --admin-text-muted: #64748b;
+
+  --admin-accent: #6366f1;        /* Indigo 500 */
+  --admin-accent-hover: #4f46e5;
+  --admin-danger: #ef4444;
+  --admin-success: #10b981;
+  --admin-warning: #f59e0b;
+}
+
+/* =========================================
+   2. الحاوية الرئيسية (Full Width Canvas)
+   ========================================= */
+.admin-page-wrapper {
+  min-height: 100vh;
+  background-color: var(--admin-bg-page);
+  padding: 32px 40px;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  direction: rtl;
+  color: var(--admin-text-main);
+  box-sizing: border-box;
+}
+
+/* =========================================
+   3. الهيدر والشريط العلوي (Header Bar)
+   ========================================= */
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.admin-title-group h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.02em;
+}
+
+.admin-subtitle {
+  color: var(--admin-text-sub);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* الإحصائيات */
+.admin-stats-group {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.stat-badge {
+  background: var(--admin-bg-card);
+  border: 1px solid var(--admin-border);
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  color: var(--admin-text-sub);
+  white-space: nowrap;
+}
+
+.stat-badge strong {
+  color: var(--admin-text-main);
+  margin-right: 6px;
+  font-size: 1rem;
+}
+
+/* =========================================
+   4. كروت المحتوى الأساسية (Main Cards)
+   ========================================= */
+.admin-main-card {
+  background-color: var(--admin-bg-card);
+  border: 1px solid var(--admin-border);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+  margin-bottom: 24px;
+}
+
+.card-title-header {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0 0 18px 0;
+  color: var(--admin-text-main);
+}
+
+/* =========================================
+   5. شريط الأدوات وعناصر الإدخال
+   ========================================= */
+.admin-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.btn-admin-add {
+  padding: 12px 24px;
+  background-color: var(--admin-accent);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-admin-add:hover {
+  background-color: var(--admin-accent-hover);
+  transform: translateY(-1px);
+}
+
+.admin-input {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--admin-border);
+  background-color: var(--admin-bg-page);
+  color: var(--admin-text-main);
+  font-size: 0.85rem;
+  outline: none;
+  width: 90px;
+  transition: all 0.2s ease;
+}
+
+.admin-input:focus {
+  border-color: var(--admin-accent);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+/* =========================================
+   6. الجداول الممتدة (Data Tables)
+   ========================================= */
+.admin-table-container {
+  width: 100%;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: right;
+  font-size: 0.95rem;
+}
+
+.admin-table th {
+  padding: 16px 20px;
+  background-color: rgba(15, 23, 42, 0.6);
+  color: var(--admin-text-sub);
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.admin-table td {
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--admin-border);
+  color: var(--admin-text-main);
+  vertical-align: middle;
+}
+
+.admin-table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.admin-table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+/* =========================================
+   7. الشارات والأزرار الإدارية
+   ========================================= */
+.badge-discount {
+  background-color: rgba(245, 158, 11, 0.12);
+  color: var(--admin-warning);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.price-text {
+  font-weight: 700;
+  color: var(--admin-success);
+}
+
+.admin-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.btn-admin-action {
+  padding: 8px 16px;
+  border: 1px solid var(--admin-border);
+  border-radius: 8px;
+  background-color: var(--admin-bg-page);
+  color: var(--admin-text-main);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-admin-action:hover {
+  background-color: var(--admin-bg-hover);
+}
+
+.btn-admin-action.add {
+  background-color: var(--admin-accent);
+  color: #ffffff;
+  border-color: transparent;
+}
+
+.btn-admin-action.add:hover {
+  background-color: var(--admin-accent-hover);
+}
+
+.btn-admin-action.delete {
+  color: var(--admin-danger);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.btn-admin-action.delete:hover {
+  background-color: rgba(239, 68, 68, 0.15);
+}
+
+.empty-state-text {
+  text-align: center;
+  color: var(--admin-text-muted);
+  padding: 24px;
+}
+
+/* =========================================
+   8. التجاوب مع الموبايل (Mobile Table Responsive)
+   ========================================= */
+@media (max-width: 992px) {
+  .admin-page-wrapper {
+    padding: 24px 20px;
+  }
+
+  .admin-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .admin-stats-group {
+    width: 100%;
+  }
+
+  .stat-badge {
+    flex: 1;
+    text-align: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-page-wrapper {
+    padding: 16px 12px;
+  }
+
+  .admin-main-card {
+    padding: 16px 12px;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+  }
+
+  .admin-table thead {
+    display: none;
+  }
+
+  .admin-table, 
+  .admin-table tbody, 
+  .admin-table tr, 
+  .admin-table td {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .admin-table tbody tr {
+    background-color: var(--admin-bg-card);
+    border: 1px solid var(--admin-border);
+    border-radius: 12px;
+    margin-bottom: 14px;
+    padding: 12px 16px;
+  }
+
+  .admin-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    text-align: left;
+  }
+
+  .admin-table td:last-child {
+    border-bottom: none;
+    padding-bottom: 4px;
+  }
+
+  .admin-table td::before {
+    content: attr(data-label);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--admin-text-sub);
+    text-transform: uppercase;
+  }
+
+  .admin-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .admin-actions .btn-admin-action {
+    flex: 1;
+    text-align: center;
+  }
+}

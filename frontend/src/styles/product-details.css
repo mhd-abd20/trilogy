@@ -1,0 +1,227 @@
+.product-details-container {
+  max-width: 1100px;
+  margin: 30px auto;
+  padding: 0 20px;
+  direction: rtl;
+}
+
+.btn-back {
+  background-color: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-bottom: 20px;
+  transition: all 0.2s;
+}
+
+.btn-back:hover {
+  background-color: #e2e8f0;
+}
+
+.details-main-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+@media (max-width: 768px) {
+  .details-main-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.details-image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 380px;
+  background-color: var(--bg-main, #f8fafc);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  border: 1px solid #f1f5f9;
+}
+
+.details-image-wrapper img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.details-discount-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background-color: #e53e3e;
+  color: #ffffff;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-weight: bold;
+  font-size: 0.85rem;
+}
+
+.details-category-tag {
+  background-color: #e0f2fe;
+  color: #0369a1;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: inline-block;
+  margin-bottom: 12px;
+}
+
+.details-title {
+  font-size: 1.8rem;
+  color: var(--text-main, #0f172a);
+  margin-bottom: 16px;
+}
+
+.details-price-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.details-price, .details-promo-price {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--primary-color, #2563eb);
+}
+
+.details-promo-price {
+  color: #e53e3e;
+}
+
+.details-original-price {
+  font-size: 1.2rem;
+  text-decoration: line-through;
+  color: #94a3b8;
+}
+
+.details-meta-list {
+  background: #f8fafc;
+  padding: 12px 16px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stock-in {
+  color: #16a34a;
+  font-weight: bold;
+}
+
+.stock-out {
+  color: #dc2626;
+  font-weight: bold;
+}
+
+.details-description {
+  margin-bottom: 24px;
+}
+
+.details-description h3 {
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+  color: #334155;
+}
+
+.details-description p {
+  color: #475569;
+  line-height: 1.6;
+}
+
+.details-purchase-controls {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.quantity-selector {
+  display: flex;
+  align-items: center;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.quantity-selector button {
+  background: #f1f5f9;
+  border: none;
+  width: 36px;
+  height: 40px;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.quantity-selector span {
+  padding: 0 16px;
+  font-weight: bold;
+}
+
+.btn-add-to-cart-large {
+  flex: 1;
+  background-color: var(--primary-color, #2563eb);
+  color: #ffffff;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-add-to-cart-large:hover {
+  background-color: #1d4ed8;
+}
+
+/* قسم فيديو يوتيوب */
+.details-video-section {
+  margin-top: 40px;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.details-video-section h2 {
+  font-size: 1.3rem;
+  margin-bottom: 16px;
+  color: var(--text-main, #0f172a);
+}
+
+.video-responsive-wrapper {
+  position: relative;
+  padding-bottom: 56.25%; /* نسبة 16:9 */
+  height: 0;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.video-responsive-wrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.details-loading, .details-error {
+  text-align: center;
+  padding: 60px 20px;
+  font-size: 1.2rem;
+}

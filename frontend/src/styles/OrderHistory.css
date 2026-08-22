@@ -1,0 +1,202 @@
+/* src/styles/OrderHistory.css */
+
+.history-container {
+  max-width: 1100px;
+  margin: 30px auto;
+  padding: 0 20px;
+  direction: rtl; /* دعم اللغة العربية */
+  min-height: 80vh;
+}
+
+.history-header {
+  margin-bottom: 30px;
+  border-bottom: 2px solid var(--border-color, #e2e8f0);
+  padding-bottom: 15px;
+}
+
+.history-header h2 {
+  font-size: 1.8rem;
+  color: var(--text-main, #0f172a);
+  font-weight: 800;
+  margin: 0;
+}
+
+/* حالة التحميل والخطأ والفراغ */
+.state-message {
+  text-align: center;
+  padding: 50px;
+  background: var(--bg-card, #ffffff);
+  border-radius: 14px;
+  border: 1px solid var(--border-color, #e2e8f0);
+  color: var(--text-main, #0f172a);
+  font-size: 1.1rem;
+}
+
+.btn-primary {
+  background: var(--primary-color, #2563eb);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  margin-top: 15px;
+  display: inline-block;
+  transition: background 0.2s;
+}
+
+.btn-primary:hover {
+  background: #1d4ed8;
+}
+
+/* قائمة الطلبات */
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+/* كارت الطلب الواحد */
+.order-card {
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* رأس كارت الطلب (الرقم، التاريخ، المجموع) */
+.order-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--border-color, #f1f5f9);
+  margin-bottom: 15px;
+}
+
+.order-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.order-id {
+  font-weight: 700;
+  color: var(--text-main, #0f172a);
+  font-size: 1.1rem;
+}
+
+.order-date {
+  color: var(--text-muted, #64748b);
+  font-size: 0.9rem;
+}
+
+.order-total-section {
+  text-align: left; /* المحاذاة لليسار لأن الأرقام والعملة أجنبية */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.total-label {
+  color: var(--text-muted, #64748b);
+  font-size: 0.9rem;
+}
+
+.total-price {
+  color: var(--primary-color, #2563eb);
+  font-weight: 800;
+  font-size: 1.3rem;
+}
+
+/* قائمة المنتجات داخل الطلب */
+.order-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.order-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 10px;
+  background-color: var(--bg-main, #f8fafc);
+  border-radius: 10px;
+  border: 1px solid var(--border-color, #f1f5f9);
+}
+
+.item-image-wrapper {
+  width: 60px;
+  height: 60px;
+  background: #fff;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border: 1px solid var(--border-color, #e2e8f0);
+}
+
+.item-image-wrapper img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.item-details {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.item-name-info h4 {
+  margin: 0;
+  color: var(--text-main, #0f172a);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.item-qty-price {
+  color: var(--text-muted, #64748b);
+  font-size: 0.9rem;
+}
+
+.item-price-calc {
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-main, #0f172a);
+}
+
+/* التجاوب مع الهواتف */
+@media (max-width: 600px) {
+  .order-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .order-total-section {
+    align-items: flex-start;
+    width: 100%;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border-color, #f1f5f9);
+  }
+
+  .item-details {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+  
+  .item-price-calc {
+    text-align: right;
+    width: 100%;
+  }
+}
