@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import '../../styles/ProductsPage.css'; 
+import '../../styles/productsPage.css'; 
 import imageCompression from 'browser-image-compression';
 import { 
   getProducts, 

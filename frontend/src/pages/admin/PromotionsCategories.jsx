@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { getPromotions, createPromotion, togglePromotionActive } from '../../api/fetchpromotions';
 import { useNavigate } from "react-router-dom";
-import '../../styles/Promotions.css';
+import '../../styles/promotions.css';
 
 const PromotionsCategories = () => {
   const [promotions, setPromotions] = useState([]);
