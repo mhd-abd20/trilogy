@@ -6,7 +6,7 @@ import {
   removeProductFromPromotion
 } from '../../api/fetchpromotions';
 import { getProducts } from '../../api/fetchproducts';
-import '../../styles/Promotions.css'; 
+import '../../styles/promotions.css'; 
 
 const Promotions = () => {
   const { id } = useParams();

@@ -20,7 +20,7 @@ const formatTimestamp = (timestamp) => {
 };
 
 const getImageUrl = (imagePath) => {
-  if (!imagePath) return PLACEHOLDER_IMAGE;
+  
   if (imagePath.startsWith('http://') || imagePath.startsWith('https://') || imagePath.startsWith('data:')) {
     return imagePath;
   }

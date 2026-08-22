@@ -10,7 +10,7 @@ import {
 
 import { getCategories } from '../../api/categoryService';
 
-const SERVER_ORIGIN = 'http://localhost:8080';
+const SERVER_ORIGIN = import.meta.env.VITE_BACKEND_URL;
 
 
 const getImageUrl = (imagePath) => {
