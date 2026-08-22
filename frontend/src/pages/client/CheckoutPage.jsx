@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../../styles/GuestCheckoutPage.css';
 
-const SERVER_ORIGIN = 'http://localhost:8080';
+const SERVER_ORIGIN = process.env.REACT_APP_BACKEND_URL;
 
 export default function GuestCheckoutPage() {
   const location = useLocation();
