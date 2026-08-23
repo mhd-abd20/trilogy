@@ -168,7 +168,7 @@ const CartPage = () => {
               <span>المجموع الكلي:</span>
               <strong>${totalPrice}</strong>
             </div>
-            {localStorage.getItem('userI') ? (
+            {localStorage.getItem('userId') ? (
               <button
                 onClick={handleCheckout}
                 disabled={loading}
