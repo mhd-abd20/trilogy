@@ -1,60 +1,115 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
+const Redis = require('ioredis');
 
+const redis = new Redis(process.env.REDIS_URL);
 
+redis.on('connect', () => {
+  console.log('Connected to Redis successfully');
+});
+
+redis.on('error', (err) => {
+  console.error('Redis Connection Error:', err);
+});
 router.post('/checkout', async (req, res) => {
-  const connection = await db.getConnection();
+  const { items, totalAmount, userId } = req.body;
+
+  // مصفوفة لتتبع العناصر التي تم خصمها من Redis لإرجاعها في حال فشل عملية MySQL
+  const decrementedItems = [];
 
   try {
-    await connection.beginTransaction();
-
-    const { items, totalAmount, userId } = req.body;
-
-    
-    const [orderResult] = await connection.query(
-      `INSERT INTO orders (user_id, total_amount, created_at) VALUES (?, ?, NOW())`,
-      [userId || null, totalAmount]
-    );
-    const orderId = orderResult.insertId;
-
-    
+    // -------------------------------------------------------------
+    // الخطوة 1: فحص وخصم الكميات في Redis (In-Memory / Fast Checking)
+    // -------------------------------------------------------------
     for (const item of items) {
-      const [productRows] = await connection.query(
-        `SELECT stock_quantity FROM products WHERE id = ? FOR UPDATE`,
-        [item.productId]
-      );
+      const stockKey = `product:stock:${item.productId}`;
 
-      if (productRows.length === 0) {
-        throw new Error(`المنتج رقم ${item.productId} غير موجود`);
+      // التأكد من وجود المفتاح في Redis، وإذا لم يكن موجوداً نجلبه من MySQL
+      const exists = await redis.exists(stockKey);
+      if (!exists) {
+        const [rows] = await db.query(
+          'SELECT stock_quantity FROM products WHERE id = ?',
+          [item.productId]
+        );
+
+        if (rows.length === 0) {
+          throw new Error(`المنتج رقم ${item.productId} غير موجود`);
+        }
+
+        // حفظ المخزون الحالي في Redis
+        await redis.set(stockKey, rows[0].stock_quantity);
       }
 
-      if (productRows[0].stock_quantity < item.quantity) {
+      // خصم الكمية بشكل ذرّي (Atomic) في أجزاء من الملي ثانية
+      const remainingStock = await redis.decrby(stockKey, item.quantity);
+      decrementedItems.push({ productId: item.productId, quantity: item.quantity });
+
+      // إذا أصبحت الكمية أقل من 0، فهذا يعني أن المخزون نفذ
+      if (remainingStock < 0) {
         throw new Error(`الكمية المطلوبة غير متوفرة للمنتج رقم ${item.productId}`);
       }
-
-     
-      await connection.query(
-        `UPDATE products SET stock_quantity = stock_quantity - ? WHERE id = ?`,
-        [item.quantity, item.productId]
-      );
-
-     
-      await connection.query(
-        `INSERT INTO order_items (order_id, product_id, quantity, unit_price) VALUES (?, ?, ?, ?)`,
-        [orderId, item.productId, item.quantity, item.unitPrice]
-      );
     }
 
-    await connection.commit();
-    res.status(201).json({ success: true, message: 'تم حفظ الطلب وتحديث المخزون بنجاح!', orderId });
+    // -------------------------------------------------------------
+    // الخطوة 2: تنفيذ الحفظ والتحديث في MySQL (بدون FOR UPDATE أو قفل ببطء)
+    // -------------------------------------------------------------
+    const connection = await db.getConnection();
+
+    try {
+      await connection.beginTransaction();
+
+      // إنشاء الطلب الرئيسي
+      const [orderResult] = await connection.query(
+        `INSERT INTO orders (user_id, total_amount, created_at) VALUES (?, ?, NOW())`,
+        [userId || null, totalAmount]
+      );
+      const orderId = orderResult.insertId;
+
+      for (const item of items) {
+        // تحديث المخزون مباشرة في جدول المنتجات
+        await connection.query(
+          `UPDATE products SET stock_quantity = stock_quantity - ? WHERE id = ?`,
+          [item.quantity, item.productId]
+        );
+
+        // إدراج تفاصيل المنتجات المشتراة
+        await connection.query(
+          `INSERT INTO order_items (order_id, product_id, quantity, unit_price) VALUES (?, ?, ?, ?)`,
+          [orderId, item.productId, item.quantity, item.unitPrice]
+        );
+      }
+
+      await connection.commit();
+      
+      return res.status(201).json({
+        success: true,
+        message: 'تم حفظ الطلب وتحديث المخزون بنجاح!',
+        orderId
+      });
+
+    } catch (dbErr) {
+      // إرجاع التغييرات في MySQL عند حدوث خطأ داتا بيز
+      await connection.rollback();
+      throw dbErr; // إلقاء الخطأ ليتكفل به الـ catch الخارجي ليقوم بـ Rollback لـ Redis
+    } finally {
+      connection.release();
+    }
 
   } catch (err) {
-    await connection.rollback();
+    // -------------------------------------------------------------
+    // الخطوة 3: إرجاع الكميات المخصومة من Redis عند حدوث أي استثناء (Rollback)
+    // -------------------------------------------------------------
+    for (const item of decrementedItems) {
+      const stockKey = `product:stock:${item.productId}`;
+      await redis.incrby(stockKey, item.quantity);
+    }
+
     console.error('Checkout Error:', err);
-    res.status(400).json({ success: false, message: err.message || 'حدث خطأ أثناء معالجة الطلب' });
-  } finally {
-    connection.release();
+    return res.status(400).json({
+      success: false,
+      message: err.message || 'حدث خطأ أثناء معالجة الطلب'
+    });
   }
 });
 
