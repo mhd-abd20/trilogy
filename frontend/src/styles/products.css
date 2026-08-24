@@ -193,3 +193,30 @@
   background-color: #334155 !important;
   color: #ffffff !important;
 }
+
+
+.product-card {
+  transition: all 0.3s ease;
+}
+
+
+.product-card.in-cart {
+  border: 2px solid var(--primary-color, #2563eb) !important;
+  background-color: #eff6ff !important; 
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.15) !important;
+}
+
+
+.in-cart-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: #10b981; 
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: bold;
+  padding: 3px 8px;
+  border-radius: 12px;
+  z-index: 2;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

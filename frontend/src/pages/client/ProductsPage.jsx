@@ -23,7 +23,7 @@ const Products = () => {
           axios.get(`${SERVER_ORIGIN}/api/products`),
           axios.get(`${SERVER_ORIGIN}/api/categories`)
         ]);
-        
+
         setProducts(Array.isArray(prodRes.data) ? prodRes.data : []);
         setCategories(Array.isArray(catRes.data) ? catRes.data : []);
       } catch (err) {
@@ -99,7 +99,7 @@ const Products = () => {
     <div className="products-container">
       <div className="products-header">
         <h2>معرض المنتجات</h2>
-        
+
       </div>
 
       <div className="filter-section">
@@ -138,13 +138,17 @@ const Products = () => {
             filteredProducts.map((product) => {
               const pId = product.id || product.product_id;
               const isOutOfStock = product.stock_quantity <= 0;
-
+              const isInCart = cart.some((item) => (item.id || item.product_id) === pId);
               const hasDiscount = product.promo_price !== null && product.promo_price !== undefined;
               const originalPrice = product.original_price || product.price;
 
               return (
                 <div key={pId} className="product-card" style={{ position: 'relative' }}>
-
+                  {isInCart && (
+                    <span className="in-cart-badge">
+                      في السلة ✓
+                    </span>
+                  )}
                   {hasDiscount && (
                     <div className="badge-container" style={{ position: 'absolute', top: '10px', right: '10px', display: 'flex', flexDirection: 'column', gap: '4px', zIndex: 1 }}>
                       <span className="discount-badge" style={{ backgroundColor: '#e53e3e', color: '#fff', padding: '2px 8px', borderRadius: '12px', fontSize: '12px', fontWeight: 'bold' }}>
