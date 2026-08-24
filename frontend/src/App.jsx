@@ -9,6 +9,7 @@ import LoginPage from './pages/admin/LoginPage';
 import RegisterPage from './pages/admin/RegisterPage';
 import HomePage from './pages/client/HomePage';
 import Navbar from './components/Navbar'; 
+import AdminNavbar from './components/AdminNavbar';
 import Products from './pages/client/ProductsPage'; 
 import CartPage from './pages/client/CartPage'; 
 import PromotionsPage from './pages/client/PromotionsPage';
