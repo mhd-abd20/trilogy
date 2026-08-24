@@ -30,7 +30,7 @@ router.get('/', async (req, res) => {
           (SELECT COALESCE(SUM(oi.quantity), 0) 
            FROM order_items oi 
            JOIN orders o ON oi.order_id = o.id 
-           WHERE o.created_at >= NOW() - INTERVAL ${selectedInterval}) AS totalItems
+           WHERE o.created_at >= NOW() - INTERVAL ${selectedInterval}) AS totalItems    
       `),
 
       // 2. المنتجات الأكثر مبيعاً
