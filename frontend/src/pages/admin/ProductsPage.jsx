@@ -53,7 +53,7 @@ export default function ProductsPage() {
 
   const [formData, setFormData] = useState({
     name: '',
-    price: '',
+    original_price: '',
     stock_quantity: '',
     category_id: '',
     description: '',
@@ -93,7 +93,7 @@ export default function ProductsPage() {
 
     const dataToSend = new FormData();
     dataToSend.append('name', formData.name);
-    dataToSend.append('price', formData.price);
+    dataToSend.append('original_price', formData.original_price);
     dataToSend.append('stock_quantity', formData.stock_quantity);
     dataToSend.append('category_id', formData.category_id);
     dataToSend.append('description', formData.description);
@@ -125,7 +125,7 @@ export default function ProductsPage() {
     setEditId(product.id);
     setFormData({
       name: product.name || '',
-      price: product.price || '',
+      original_price: product.original_price || '',
       stock_quantity: product.stock_quantity || '',
       category_id: product.category_id || '',
       description: product.description || '',
@@ -153,7 +153,7 @@ export default function ProductsPage() {
   const resetForm = () => {
     setFormData({
       name: '',
-      price: '',
+      original_price: '',
       stock_quantity: '',
       category_id: '',
       description: '',
@@ -199,7 +199,7 @@ export default function ProductsPage() {
                   step="0.01"
                   name="original_price"
                   placeholder="0.00"
-                  value={formData.price}
+                  value={formData.original_price}
                   onChange={handleInputChange}
                   required
                 />
