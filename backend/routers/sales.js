@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require('../db');
 
 router.get('/', async (req, res) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
   try {
     const { timeframe } = req.query;
 

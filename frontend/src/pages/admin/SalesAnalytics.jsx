@@ -29,7 +29,12 @@ export default function SalesAnalytics() {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`${SERVER_ORIGIN}/api/sales?timeframe=${selectedTimeframe}`);
+      const response = await axios.get(`${SERVER_ORIGIN}/api/sales`, {
+        params: {
+          timeframe: selectedTimeframe,
+          _t: Date.now()
+        }
+      });
       
       setData({
         totalSales: Number(response.data.totalSales) || 0,
