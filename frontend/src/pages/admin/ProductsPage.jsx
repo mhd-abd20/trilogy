@@ -324,11 +324,13 @@ export default function ProductsPage() {
                   </span>
 
                   <h3 className="product-title">{p.name}</h3>
-                  <div className="product-price">${Number(p.price).toFixed(2)}</div>
+                  <div className="product-price">
+                    ${(Number(p.price || p.original_price || 0)).toFixed(2)}
+                  </div>
                   
                   <p className="product-info">
                     المخزون: <strong>{p.stock_quantity}</strong>
-                  </p>
+                  </p>  
 
                   {p.description && (
                     <p className="product-description">

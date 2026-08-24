@@ -22,7 +22,6 @@ function App() {
     <BrowserRouter>
       <Navbar />
       <Routes>
-        {/* راوتس الأدمن المحمية */}
         <Route element={<ProtectedRoute allowedRoles={["admin"]} />}> 
           <Route path='/categories' element={<CategoriesList />} />
           <Route path='/add-promotions' element={<PromotionsCategories />} />
@@ -30,7 +29,7 @@ function App() {
           <Route path='/add-products' element={<ProductsPage />} />
         </Route>
 
-        {/* الراوتس العامة */}
+       
         <Route path='/login' element={<LoginPage />} />
         <Route path='/register' element={<RegisterPage />} />
         <Route path='/' element={<HomePage />} />
@@ -41,7 +40,7 @@ function App() {
         <Route path="/products/:id" element={<ProductDetails />} />
         <Route path="/guest-checkout" element={<GuestCheckoutPage />} />
 
-        {/* راوتس الزبون المحمية */}
+       
         <Route element={<ProtectedRoute allowedRoles={["client"]} />}>
           <Route path="/order-history" element={<OrderHistory />} />
         </Route>
