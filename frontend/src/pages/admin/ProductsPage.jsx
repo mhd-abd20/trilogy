@@ -197,7 +197,7 @@ export default function ProductsPage() {
                 <input
                   type="number"
                   step="0.01"
-                  name="price"
+                  name="original_price"
                   placeholder="0.00"
                   value={formData.price}
                   onChange={handleInputChange}
