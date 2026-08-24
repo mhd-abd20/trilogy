@@ -18,10 +18,19 @@ import GuestCheckoutPage from './pages/client/CheckoutPage';
 import OrderHistory from './pages/client/OrderHistory';
 import HomeRedirect from './components/HomeRedirect';
 
+const DynamicNavbar = () => {
+  const role = localStorage.getItem('userRole');
+  if (role === 'admin') {
+    return <AdminNavbar />;
+  }
+  return <Navbar />;
+};
+
+
 function App() {
   return (
     <BrowserRouter>
-      <Navbar />
+     <DynamicNavbar />
       <Routes>
         <Route element={<ProtectedRoute allowedRoles={["admin"]} />}> 
           <Route path='/categories' element={<CategoriesList />} />
