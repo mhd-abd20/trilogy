@@ -16,6 +16,7 @@ import PromotionDetails from './pages/client/PromotionDetails';
 import ProductDetails from './pages/client/ProductDetails';
 import GuestCheckoutPage from './pages/client/CheckoutPage';
 import OrderHistory from './pages/client/OrderHistory';
+import HomeRedirect from './components/HomeRedirect';
 
 function App() {
   return (
@@ -32,7 +33,8 @@ function App() {
        
         <Route path='/login' element={<LoginPage />} />
         <Route path='/register' element={<RegisterPage />} />
-        <Route path='/' element={<HomePage />} />
+
+        <Route path='/' element={<HomeRedirect />} />
         <Route path='/products' element={<Products />} />
         <Route path='/cart' element={<CartPage />} />
         <Route path="/promotions" element={<PromotionsPage />} />
