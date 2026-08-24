@@ -29,12 +29,15 @@ export default function SalesAnalytics() {
     setLoading(true);
     setError(null);
     try {
+      console.log(`[SalesAnalytics Debug] Fetching sales data for timeframe: "${selectedTimeframe}" from ${SERVER_ORIGIN}`);
       const response = await axios.get(`${SERVER_ORIGIN}/api/sales`, {
         params: {
           timeframe: selectedTimeframe,
           _t: Date.now()
         }
       });
+      
+      console.log(`[SalesAnalytics Debug] Server Response for "${selectedTimeframe}":`, response.data);
       
       setData({
         totalSales: Number(response.data.totalSales) || 0,
