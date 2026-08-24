@@ -1,55 +1,85 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import '../styles/adminNavbar.css'; // استيراد التنسيقات
+import { FiMenu, FiX, FiLogOut, FiGrid, FiTag, FiBox, FiShield } from 'react-icons/fi';
+import '../styles/adminNavbar.css';
 
 export default function AdminNavbar() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    
     localStorage.removeItem('userId');
     localStorage.removeItem('userRole');
-    localStorage.removeItem('token'); 
+    localStorage.removeItem('token');
+    setIsMenuOpen(false);
     navigate('/login', { replace: true });
+  };
+
+  const toggleMenu = () => {
+    setIsMenuOpen(prev => !prev);
+  };
+
+  const closeMenu = () => {
+    setIsMenuOpen(false);
   };
 
   return (
     <nav className="admin-navbar">
       <div className="admin-nav-container">
-        <div className="admin-logo">
-          <span>لوحة التحكم (Admin)</span>
+        <div className="admin-brand">
+          <FiShield className="brand-icon" />
+          <span className="brand-title">لوحة التحكم</span>
+          <span className="brand-badge">ADMIN</span>
         </div>
 
-        <ul className="admin-nav-links">
-          <li>
-            <NavLink 
-              to="/categories" 
-              className={({ isActive }) => (isActive ? 'active-link' : '')}
-            >
-              الفئات (Categories)
-            </NavLink>
-          </li>
-          <li>
-            <NavLink 
-              to="/add-promotions" 
-              className={({ isActive }) => (isActive ? 'active-link' : '')}
-            >
-              العروض والتخفيضات
-            </NavLink>
-          </li>
-          <li>
-            <NavLink 
-              to="/add-products" 
-              className={({ isActive }) => (isActive ? 'active-link' : '')}
-            >
-              إدارة المنتجات
-            </NavLink>
-          </li>
-        </ul>
-
-        <button onClick={handleLogout} className="btn-logout">
-          تسجيل الخروج
+        <button 
+          className="admin-menu-toggle" 
+          onClick={toggleMenu}
+          aria-label="تغيير القائمة"
+          aria-expanded={isMenuOpen}
+        >
+          {isMenuOpen ? <FiX /> : <FiMenu />}
         </button>
+
+        <div className={`admin-nav-content ${isMenuOpen ? 'open' : ''}`}>
+          <ul className="admin-nav-links">
+            <li>
+              <NavLink 
+                to="/categories" 
+                className={({ isActive }) => (isActive ? 'nav-item active-link' : 'nav-item')}
+                onClick={closeMenu}
+              >
+                <FiGrid className="nav-icon" />
+                <span>الفئات</span>
+              </NavLink>
+            </li>
+            <li>
+              <NavLink 
+                to="/add-promotions" 
+                className={({ isActive }) => (isActive ? 'nav-item active-link' : 'nav-item')}
+                onClick={closeMenu}
+              >
+                <FiTag className="nav-icon" />
+                <span>العروض والتخفيضات</span>
+              </NavLink>
+            </li>
+            <li>
+              <NavLink 
+                to="/add-products" 
+                className={({ isActive }) => (isActive ? 'nav-item active-link' : 'nav-item')}
+                onClick={closeMenu}
+              >
+                <FiBox className="nav-icon" />
+                <span>إدارة المنتجات</span>
+              </NavLink>
+            </li>
+          </ul>
+
+          <button onClick={handleLogout} className="btn-logout">
+            <FiLogOut className="logout-icon" />
+            <span>تسجيل الخروج</span>
+          </button>
+        </div>
       </div>
     </nav>
   );
