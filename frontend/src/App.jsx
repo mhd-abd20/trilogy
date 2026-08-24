@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
 import HomeRedirect from './components/HomeRedirect';
 
@@ -24,6 +24,7 @@ import OrderHistory from './pages/client/OrderHistory';
 
 
 const DynamicNavbar = () => {
+  const location = useLocation();
   const role = localStorage.getItem('userRole');
   if (role === 'admin') {
     return <AdminNavbar />;

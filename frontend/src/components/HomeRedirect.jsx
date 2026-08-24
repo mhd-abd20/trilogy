@@ -1,5 +1,5 @@
 import { Navigate } from "react-router-dom";
-import HomePage from "./pages/client/HomePage";
+import HomePage from "../pages/client/HomePage";
 
 const HomeRedirect = () => {
   const userRole = localStorage.getItem("userRole");

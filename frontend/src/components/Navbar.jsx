@@ -82,6 +82,7 @@ useEffect(()=>{
               title="تسجيل الخروج"
               onClick={() => {
                 localStorage.removeItem('userId');
+                localStorage.removeItem('userRole');
                 window.location.reload();
                 navigate('/')
               }}
