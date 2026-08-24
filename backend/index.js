@@ -13,7 +13,7 @@ const productsRouter = require('./routers/productions');
 const loginRouter = require('./routers/login')
 const ordersRouter = require('./routers/orders')
 const usersRouter = require('./routers/users')
-
+const salesRouter = require('./routers/sales')
 
 
 app.use('/api/categories', categoriesRouter);
@@ -22,6 +22,7 @@ app.use('/api/products',productsRouter)
 app.use('/api/login',loginRouter)
 app.use('/api/orders',ordersRouter)
 app.use('/api/users',usersRouter)
+app.use('/api/sales',salesRouter)
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.listen(port, () => {
