@@ -96,12 +96,7 @@ export default function SalesAnalytics() {
               <h3>إجمالي القطع المباعة</h3>
               <p className="kpi-value">{data.totalItems}</p>
             </div>
-            <div className="kpi-card">
-              <h3>متوسط قيمة الطلب</h3>
-              <p className="kpi-value">
-                ${data.totalOrders > 0 ? (data.totalSales / data.totalOrders).toFixed(2) : '0.00'}
-              </p>
-            </div>
+       
           </div>
 
           {/* الرسم البياني لأكثر المنتجات مبيعاً */}
