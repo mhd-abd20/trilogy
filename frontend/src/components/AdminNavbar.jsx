@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { FiMenu, FiX, FiLogOut, FiGrid, FiTag, FiBox, FiShield } from 'react-icons/fi';
+import { FiMenu, FiX, FiLogOut, FiGrid, FiTag, FiBox, FiShield,FiBarChart2 } from 'react-icons/fi';
 import '../styles/adminNavbar.css';
 
 export default function AdminNavbar() {
@@ -73,7 +73,7 @@ export default function AdminNavbar() {
                 <span>إدارة المنتجات</span>
               </NavLink>
               <NavLink 
-                to="/sales-analytics" 
+                to="/ sales-analytics" 
                 className={({ isActive }) => (isActive ? 'nav-item active-link' : 'nav-item')}
                 onClick={closeMenu}
               >
