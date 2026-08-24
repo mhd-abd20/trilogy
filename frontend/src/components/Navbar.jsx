@@ -83,6 +83,7 @@ useEffect(()=>{
               onClick={() => {
                 localStorage.removeItem('userId');
                 window.location.reload();
+                navigate('/')
               }}
             >
               <FiLogOut className="btn-icon" />
@@ -97,7 +98,7 @@ useEffect(()=>{
               <FiLogIn className="btn-icon" />
               <span className="btn-text">تسجيل الدخول</span>
             </button>
-          )}
+          )}  
         </div>
       </div>
     </nav>

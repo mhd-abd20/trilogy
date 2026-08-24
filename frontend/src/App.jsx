@@ -1,4 +1,5 @@
 import {BrowserRouter,Route,Routes} from 'react-router-dom'
+import ProtectedRoute from './components/ProtectedRoute'
 
 import CategoriesList from './pages/admin/CategoriesList'
 import PromotionsCategories from './pages/admin/PromotionsCategories'
@@ -23,10 +24,12 @@ function App() {
     <BrowserRouter>
     <Navbar/>
     <Routes>
-      <Route path='/categories' element={<CategoriesList/>}></Route>
-      <Route path='/add-promotions' element={<PromotionsCategories/>}></Route>
-      <Route path='/add-promotions/:id' element={<Promotions/>}></Route>
-      <Route path='/add-products' element={<ProductsPage/>}></Route>
+      <Route element={ProtectedRoute} allowedRoles={["admin"]}> 
+        <Route path='/categories' element={<CategoriesList/>}></Route>
+        <Route path='/add-promotions' element={<PromotionsCategories/>}></Route>
+        <Route path='/add-promotions/:id' element={<Promotions/>}></Route>
+        <Route path='/add-products' element={<ProductsPage/>}></Route>
+      </Route>
       <Route path='/login' element={<LoginPage/>}></Route>
        <Route path='/register' element={<RegisterPage/>}></Route>
 
@@ -38,7 +41,9 @@ function App() {
   <Route path="/promotions/:id" element={<PromotionDetails />} />
    <Route path="/products/:id" element={<ProductDetails />} />
    <Route path="/guest-checkout" element={<GuestCheckoutPage />} />
+   <Route element={ProtectedRoute} allowedRoles={["client"]}>
     <Route path="/order-history" element={<OrderHistory />} />
+    </Route>
     </Routes>
     
     </BrowserRouter>
