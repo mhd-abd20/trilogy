@@ -1,0 +1,105 @@
+.analytics-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  direction: rtl;
+}
+
+.analytics-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.analytics-header h2 {
+  margin: 0;
+  color: #0f172a;
+}
+
+.analytics-header p {
+  margin: 0.25rem 0 0 0;
+  color: #64748b;
+}
+
+.filter-buttons {
+  display: flex;
+  gap: 0.5rem;
+  background-color: #f1f5f9;
+  padding: 4px;
+  border-radius: 8px;
+}
+
+.filter-buttons button {
+  border: none;
+  background: transparent;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-buttons button.active {
+  background-color: #ffffff;
+  color: #0284c7;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.kpi-card {
+  background: #ffffff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.kpi-card h3 {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+.kpi-value {
+  margin: 0.5rem 0 0 0;
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #0f172a;
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  gap: 1.5rem;
+}
+
+.chart-card {
+  background: #ffffff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.chart-card h3 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  color: #1e293b;
+  font-size: 1.1rem;
+}
+
+.loading-text {
+  text-align: center;
+  color: #64748b;
+  padding: 3rem 0;
+}

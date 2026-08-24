@@ -21,8 +21,7 @@ import PromotionDetails from './pages/client/PromotionDetails';
 import ProductDetails from './pages/client/ProductDetails';
 import GuestCheckoutPage from './pages/client/CheckoutPage';
 import OrderHistory from './pages/client/OrderHistory';
-
-
+import SalesAnalytics from './pages/admin/SalesAnalytics';  
 const DynamicNavbar = () => {
   const location = useLocation();
   const role = localStorage.getItem('userRole');
@@ -45,6 +44,7 @@ function App() {
           <Route path='/add-promotions' element={<PromotionsCategories />} />
           <Route path='/add-promotions/:id' element={<Promotions />} />
           <Route path='/add-products' element={<ProductsPage />} />
+          <Route path='/sales-analytics' element={<SalesAnalytics />} />
         </Route>
 
       
@@ -58,7 +58,6 @@ function App() {
         <Route path="/products/:id" element={<ProductDetails />} />
         <Route path="/guest-checkout" element={<GuestCheckoutPage />} />
 
-        {/* راوتس الزبون المحمية */}
         <Route element={<ProtectedRoute allowedRoles={["client"]} />}>
           <Route path="/order-history" element={<OrderHistory />} />
         </Route>
