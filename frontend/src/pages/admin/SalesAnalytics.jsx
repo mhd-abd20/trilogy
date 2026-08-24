@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios'; // تم إضافة axios
+import axios from 'axios';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
   PieChart, Pie, Cell 
 } from 'recharts';
 import '../../styles/salesAnalytics.css';
 
+const SERVER_ORIGIN = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080';
 const COLORS = ['#0284c7', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
 
 export default function SalesAnalytics() {
@@ -27,7 +28,7 @@ export default function SalesAnalytics() {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`/api/sales?timeframe=${selectedTimeframe}`);
+      const response = await axios.get(`${SERVER_ORIGIN}/api/sales?timeframe=${selectedTimeframe}`);
       
       setData({
         totalSales: Number(response.data.totalSales) || 0,

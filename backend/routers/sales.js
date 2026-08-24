@@ -1,8 +1,6 @@
-
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
-
 
 router.get('/', async (req, res) => {
   try {
@@ -15,7 +13,7 @@ router.get('/', async (req, res) => {
       intervalCondition = "INTERVAL 30 DAY";
     }
 
-   
+    // 1. Total Sales and Orders
     const [totals] = await db.query(`
       SELECT 
         COALESCE(SUM(total_amount), 0) AS totalSales,
@@ -24,12 +22,12 @@ router.get('/', async (req, res) => {
       WHERE created_at >= NOW() - ${intervalCondition}
     `);
 
-
+    // 2. Top Selling Products
     const [topProducts] = await db.query(`
       SELECT 
         p.name,
-        SUM(oi.quantity) AS salesCount,
-        SUM(oi.quantity * oi.price) AS revenue
+        COALESCE(SUM(oi.quantity), 0) AS salesCount,
+        COALESCE(SUM(oi.quantity * oi.unit_price), 0) AS revenue
       FROM order_items oi
       JOIN orders o ON oi.order_id = o.id
       JOIN products p ON oi.product_id = p.id
@@ -39,11 +37,11 @@ router.get('/', async (req, res) => {
       LIMIT 5
     `);
 
-    
+    // 3. Category Sales Distribution
     const [categorySales] = await db.query(`
       SELECT 
-        c.name,
-        SUM(oi.quantity * oi.price) AS value
+        COALESCE(c.name, 'غير محدد') AS name,
+        COALESCE(SUM(oi.quantity * oi.unit_price), 0) AS value
       FROM order_items oi
       JOIN orders o ON oi.order_id = o.id
       JOIN products p ON oi.product_id = p.id
@@ -53,9 +51,12 @@ router.get('/', async (req, res) => {
       ORDER BY value DESC
     `);
 
+    const totalSales = totals && totals.length > 0 ? Number(totals[0].totalSales) : 0;
+    const totalOrders = totals && totals.length > 0 ? Number(totals[0].totalOrders) : 0;
+
     res.json({
-      totalSales: Number(totals[0].totalSales),
-      totalOrders: Number(totals[0].totalOrders),
+      totalSales,
+      totalOrders,
       topProducts: topProducts.map(item => ({
         ...item,
         salesCount: Number(item.salesCount),
@@ -69,7 +70,7 @@ router.get('/', async (req, res) => {
 
   } catch (error) {
     console.error("Sales Analytics Error:", error);
-    res.status(500).json({ message: "حدث خطأ أثناء جلب بيانات المبيعات" });
+    res.status(500).json({ message: "حدث خطأ أثناء جلب بيانات المبيعات", error: error.message });
   }
 });
 
