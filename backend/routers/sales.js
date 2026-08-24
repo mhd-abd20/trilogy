@@ -13,13 +13,15 @@ router.get('/', async (req, res) => {
       intervalCondition = "INTERVAL 30 DAY";
     }
 
-    // 1. Total Sales and Orders
+    // 1. Total Sales, Orders, and Items Sold
     const [totals] = await db.query(`
       SELECT 
-        COALESCE(SUM(total_amount), 0) AS totalSales,
-        COUNT(id) AS totalOrders
-      FROM orders
-      WHERE created_at >= NOW() - ${intervalCondition}
+        COALESCE(SUM(o.total_amount), 0) AS totalSales,
+        COUNT(DISTINCT o.id) AS totalOrders,
+        COALESCE(SUM(oi.quantity), 0) AS totalItems
+      FROM orders o
+      LEFT JOIN order_items oi ON o.id = oi.order_id
+      WHERE o.created_at >= NOW() - ${intervalCondition}
     `);
 
     // 2. Top Selling Products
@@ -53,10 +55,12 @@ router.get('/', async (req, res) => {
 
     const totalSales = totals && totals.length > 0 ? Number(totals[0].totalSales) : 0;
     const totalOrders = totals && totals.length > 0 ? Number(totals[0].totalOrders) : 0;
+    const totalItems = totals && totals.length > 0 ? Number(totals[0].totalItems) : 0;
 
     res.json({
       totalSales,
       totalOrders,
+      totalItems,
       topProducts: topProducts.map(item => ({
         ...item,
         salesCount: Number(item.salesCount),

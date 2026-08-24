@@ -16,6 +16,7 @@ export default function SalesAnalytics() {
   const [data, setData] = useState({
     totalSales: 0,
     totalOrders: 0,
+    totalItems: 0,
     topProducts: [],
     categorySales: []
   });
@@ -33,6 +34,7 @@ export default function SalesAnalytics() {
       setData({
         totalSales: Number(response.data.totalSales) || 0,
         totalOrders: Number(response.data.totalOrders) || 0,
+        totalItems: Number(response.data.totalItems) || 0,
         topProducts: response.data.topProducts || [],
         categorySales: response.data.categorySales || []
       });
@@ -89,6 +91,10 @@ export default function SalesAnalytics() {
             <div className="kpi-card">
               <h3>عدد الطلبات</h3>
               <p className="kpi-value">{data.totalOrders}</p>
+            </div>
+            <div className="kpi-card">
+              <h3>إجمالي القطع المباعة</h3>
+              <p className="kpi-value">{data.totalItems}</p>
             </div>
             <div className="kpi-card">
               <h3>متوسط قيمة الطلب</h3>
