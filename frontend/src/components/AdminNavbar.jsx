@@ -73,7 +73,7 @@ export default function AdminNavbar() {
                 <span>إدارة المنتجات</span>
               </NavLink>
               <NavLink 
-                to="/ sales-analytics" 
+                to="/sales-analytics" 
                 className={({ isActive }) => (isActive ? 'nav-item active-link' : 'nav-item')}
                 onClick={closeMenu}
               >
