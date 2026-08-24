@@ -1,8 +1,7 @@
 import { Navigate, Outlet } from "react-router-dom";
 
-export const ProtectedRoute = ({ allowedRoles }) => {
+const ProtectedRoute = ({ allowedRoles }) => {
   const userRole = localStorage.getItem("userRole");
-
 
   if (!userRole || !allowedRoles.includes(userRole)) {
     return <Navigate to="/" replace />;
@@ -10,3 +9,5 @@ export const ProtectedRoute = ({ allowedRoles }) => {
 
   return <Outlet />;
 };
+
+export default ProtectedRoute;
