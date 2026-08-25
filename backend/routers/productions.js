@@ -193,7 +193,6 @@ router.delete('/:id', async (req, res) => {
 });
 
 
-
 router.post('/generate-image', async (req, res) => {
   try {
     const { prompt } = req.body;
@@ -202,20 +201,32 @@ router.post('/generate-image', async (req, res) => {
       return res.status(400).json({ message: 'يرجى إدخال وصف للصورة' });
     }
 
-    // تنظيف النص وتحويله لرابط آمن (URL Safe)
-    const encodedPrompt = encodeURIComponent(prompt.trim());
+    console.log('الوصف الأصلي (عربي):', prompt);
+
+    // 1. ترجمة النص تلقائياً إلى الإنجليزية (أو إبقاؤه إن كان إنجليزياً بالأصل)
+    const translationRes = await translate(prompt.trim(), { to: 'en' });
+    const englishPrompt = translationRes.text;
+
+    console.log('الوصف بعد الترجمة (إنجليزي):', englishPrompt);
+
+    // 2. تنظيف الوصف المترجم وتحويله لـ URL Safe
+    const encodedPrompt = encodeURIComponent(englishPrompt);
     
-    // إضافة seed عشوائي لتجنب الكاش وجلب صورة جديدة دائماً عند طلب نفس الوصف
+    // 3. إضافة Seed عشوائي وتحديد نموذج قوي مثل flux في Pollinations
     const randomSeed = Math.floor(Math.random() * 1000000);
 
-    // بناء الرابط المباشر من Pollinations AI
-    const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=800&height=800&seed=${randomSeed}&nologo=true`;
+    // استخدام نموذج flux للحصول على نتائج عالية الجودة جداً لصور المنتجات
+    const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=800&height=800&seed=${randomSeed}&model=flux&nologo=true`;
 
-    res.json({ imageUrl });
+    res.json({ 
+      imageUrl,
+      translatedPrompt: englishPrompt // اختياري: لإرجاع النص المترجم للفرونت إند إن أردت رؤيته
+    });
 
   } catch (error) {
     console.error('Image Generation Error:', error);
     res.status(500).json({ message: 'حدث خطأ أثناء توليد الصورة' });
   }
 });
+
 module.exports = router;
