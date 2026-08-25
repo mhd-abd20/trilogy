@@ -14,7 +14,7 @@ const loginRouter = require('./routers/login')
 const ordersRouter = require('./routers/orders')
 const usersRouter = require('./routers/users')
 const salesRouter = require('./routers/sales')
-
+const generateimage = require('./routers/imageGenerator')
 
 app.use('/api/categories', categoriesRouter);
 app.use('/api/promotions',promotionsRouter)
@@ -24,6 +24,7 @@ app.use('/api/orders',ordersRouter)
 app.use('/api/users',usersRouter)
 app.use('/api/sales',salesRouter)
 app.use('/images', express.static(path.join(__dirname, 'images')));
+
 
 app.listen(port, () => {
   console.log(`app is listening at http://localhost:${port}`);

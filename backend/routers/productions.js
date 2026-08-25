@@ -192,4 +192,30 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+
+
+router.post('/generate-image', async (req, res) => {
+  try {
+    const { prompt } = req.body;
+
+    if (!prompt || prompt.trim() === '') {
+      return res.status(400).json({ message: 'يرجى إدخال وصف للصورة' });
+    }
+
+    // تنظيف النص وتحويله لرابط آمن (URL Safe)
+    const encodedPrompt = encodeURIComponent(prompt.trim());
+    
+    // إضافة seed عشوائي لتجنب الكاش وجلب صورة جديدة دائماً عند طلب نفس الوصف
+    const randomSeed = Math.floor(Math.random() * 1000000);
+
+    // بناء الرابط المباشر من Pollinations AI
+    const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=800&height=800&seed=${randomSeed}&nologo=true`;
+
+    res.json({ imageUrl });
+
+  } catch (error) {
+    console.error('Image Generation Error:', error);
+    res.status(500).json({ message: 'حدث خطأ أثناء توليد الصورة' });
+  }
+});
 module.exports = router;

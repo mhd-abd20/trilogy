@@ -72,6 +72,8 @@ export default function AdminNavbar() {
                 <FiBox className="nav-icon" />
                 <span>إدارة المنتجات</span>
               </NavLink>
+              </li>
+              <li>
               <NavLink 
                 to="/sales-analytics" 
                 className={({ isActive }) => (isActive ? 'nav-item active-link' : 'nav-item')}
@@ -80,6 +82,7 @@ export default function AdminNavbar() {
                 <FiBarChart2 className="nav-icon" />
                 <span>تحليلات المبيعات</span>
               </NavLink>
+              
             </li>
           </ul>
 

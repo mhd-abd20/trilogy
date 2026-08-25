@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../../styles/productsPage.css'; 
 import imageCompression from 'browser-image-compression';
+import ImageGeneratorInput from '../../components/ImageGeneratorInput';
 import { 
   getProducts, 
   createProduct, 
@@ -11,9 +12,10 @@ import {
 import { getCategories } from '../../api/categoryService';
 
 const SERVER_ORIGIN = import.meta.env.VITE_BACKEND_URL;
-
+const PLACEHOLDER_IMAGE = '/placeholder.png'; 
 
 const getImageUrl = (imagePath) => {
+  if (!imagePath) return PLACEHOLDER_IMAGE;
   if (
     imagePath.startsWith('http://') || 
     imagePath.startsWith('https://') || 
@@ -28,10 +30,10 @@ const getImageUrl = (imagePath) => {
 
 const compressImageFile = async (file) => {
   const options = {
-    maxSizeMB: 1,           // أقصى حجم مسموح به (مثلاً 1 ميجابايت)
-    maxWidthOrHeight: 1200, // أقصى عرض أو ارتفاع بالبكسل
-    useWebWorker: true,     // تسريع العملية عبر Web Worker لعدم تجميد الواجهة
-    fileType: 'image/jpeg'  // التحويل إلى JPEG لضغط أفضل
+    maxSizeMB: 1,          
+    maxWidthOrHeight: 1200, 
+    useWebWorker: true,    
+    fileType: 'image/jpeg'  
   };
 
   try {
@@ -86,6 +88,12 @@ export default function ProductsPage() {
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // دالة التعامل مع استلام الصورة المولدة من المكون الفرعي
+  const handleImageGenerated = (generatedUrl) => {
+    setImageUrlInput(generatedUrl);
+    setImageFile(null); // إلغاء تحديد الملف اليدوي في حال توليد صورة
   };
 
   const handleSubmit = async (e) => {
@@ -171,9 +179,9 @@ export default function ProductsPage() {
         {/* الهيدر */}
         <div className="products-header">
           <h2>إدارة المنتجات</h2>
-          
         </div>
         <p>قم بإضافة وتعديل أو حذف المنتجات من لوحة التحكم</p> 
+        
         {/* نموذج الإضافة والتعديل */}
         <div className="product-form-card">
           <h3>{editId ? 'تعديل بيانات المنتج' : 'إضافة منتج جديد'}</h3>
@@ -245,11 +253,12 @@ export default function ProductsPage() {
                 rows="3"
               />
             </div>
-               <div className="form-group">
-              <label> رابط يوتيوب: </label>
+
+            <div className="form-group">
+              <label>رابط يوتيوب:</label>
               <textarea
                 name="youtube_url"
-                placeholder=" مقطع يوتيوب توضيحي..."
+                placeholder="مقطع يوتيوب توضيحي..."
                 value={formData.youtube_url}
                 onChange={handleInputChange}
                 rows="3"
@@ -262,20 +271,20 @@ export default function ProductsPage() {
                 type="file"
                 accept="image/*"
                 capture="environment"
-                onChange={(e) => setImageFile(e.target.files[0])}
+                onChange={(e) => {
+                  setImageFile(e.target.files[0]);
+                  if (e.target.files[0]) setImageUrlInput(''); // مسح رابط الصورة المولد إذا تم رفع ملف
+                }}
               />
             </div>
 
             <div className="form-divider">أو</div>
 
             <div className="form-group">
-              <label>2. رابط صورة (URL / Base64):</label>
-              <input
-                type="text"
-                placeholder="https://example.com/image.jpg أو data:image/..."
-                value={imageUrlInput}
-                onChange={(e) => setImageUrlInput(e.target.value)}
-                disabled={!!imageFile}
+              <label>2. كتابة وصف وتوليد صورة بالذكاء الاصطناعي:</label>
+              <ImageGeneratorInput 
+                onImageGenerated={handleImageGenerated} 
+                initialUrl={imageUrlInput}
               />
             </div>
 

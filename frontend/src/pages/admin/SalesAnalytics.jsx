@@ -58,7 +58,6 @@ export default function SalesAnalytics() {
     <div className="analytics-container">
       <div className="analytics-header">
         <div>
-          <p>test</p>
           <h2>تحليلات المبيعات</h2>
           <p>متابعة أداء المتجر والأكثر مبيعاً</p>
         </div>
