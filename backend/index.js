@@ -14,7 +14,7 @@ const loginRouter = require('./routers/login')
 const ordersRouter = require('./routers/orders')
 const usersRouter = require('./routers/users')
 const salesRouter = require('./routers/sales')
-const generateimage = require('./routers/imageGenerator')
+
 
 app.use('/api/categories', categoriesRouter);
 app.use('/api/promotions',promotionsRouter)
