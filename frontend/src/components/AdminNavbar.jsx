@@ -31,7 +31,6 @@ export default function AdminNavbar() {
         <div className="admin-brand">
           <FiShield className="brand-icon" />
           <span className="brand-title">لوحة التحكم</span>
-          <span className="brand-badge">ADMIN</span>
         </div>
 
         <button 
