@@ -253,18 +253,37 @@
   margin-bottom: 8px;
 }
 
-/* تنسيق نص المعلومات (المخزون / الكمية المتوفرة) */
-.product-info {
-  color: #94a3b8; /* لون رمادي فاتح مريح للعين */
-  font-size: 0.95rem;
-  margin-top: 8px;
-  margin-bottom: 8px;
+/* الألوان الافتراضية للوضع الفاتح (Light Mode) */
+.product-card {
+  background-color: #ffffff;
+  color: #1e293b;
 }
 
-/* تنسيق رقم الكمية المتوفرة لجعلها بارزة وواضحة */
+.product-info {
+  color: #64748b; /* لون رمادي غامق للنص العادي */
+}
+
 .product-info strong {
-  color: #f8fafc; /* لون أبيض ناصع ليظهر بوضوح في الوضع الداكن */
-  font-weight: 600;
+  color: #0f172a; /* لون غامق بارز للرقم */
+}
+
+/* ========================================== */
+/* تخصيص الوضع الداكن فقط (Dark Mode Only)     */
+/* ========================================== */
+@media (prefers-color-scheme: dark) {
+  /* خيار أ: إذا كنت تريد جعل خلفية الكارت داكنة والنص أبيض */
+  .product-card {
+    background-color: #1e293b;
+    border: 1px solid #334155;
+  }
+  
+  .product-info {
+    color: #94a3b8 !important; /* لون رمادي فاتح */
+  }
+  
+  .product-info strong {
+    color: #f8fafc !important; /* لون أبيض ليظهر بوضوح */
+  }
 }
 
 .product-description {
