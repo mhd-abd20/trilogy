@@ -120,7 +120,7 @@ const RegisterPage = () => {
 
           <div className="recaptcha-wrapper">
             <ReCAPTCHA
-              sitekey='6LddnoAtAAAAAIJVKapF_i8BQ8cLfdlYpNi6rtZY'
+              sitekey='6Ldob5ktAAAAAIOveG8wH__Igu0y4FSyv_GmNEDt'
               onChange={val => setCapVal(val)}
             />
           </div>
