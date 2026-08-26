@@ -4,6 +4,9 @@ const db = require('../db');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const Redis = require('ioredis');
+
+const redis = new Redis(process.env.REDIS_URL);
 
 async function translateToEnglish(text) {
   try {
@@ -137,7 +140,10 @@ router.post('/', upload.single('image'), async (req, res) => {
 router.put('/:id', upload.single('image'), async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, price, stock_quantity, category_id, description, image_url , youtube_url } = req.body;
+    const { name, price, original_price, stock_quantity, category_id, description, image_url, youtube_url } = req.body;
+
+    // لضمان قراءة السعر سواء جاء باسم price أو original_price
+    const finalPrice = price !== undefined ? price : original_price;
 
     let query = '';
     let queryParams = [];
@@ -147,26 +153,24 @@ router.put('/:id', upload.single('image'), async (req, res) => {
       const newImageUrl = `/images/${req.file.filename}`;
       query = `
         UPDATE products 
-        SET name = ?, price = ?, stock_quantity = ?, category_id = ?, description = ?, image_url = ? , youtube_url= ?
+        SET name = ?, price = ?, stock_quantity = ?, category_id = ?, description = ?, image_url = ?, youtube_url = ?
         WHERE id = ?
       `;
-      queryParams = [name, price, stock_quantity, category_id, description, newImageUrl, youtube_url, id];
+      queryParams = [name, finalPrice, stock_quantity, category_id, description, newImageUrl, youtube_url, id];
     } else if (image_url !== undefined) {
-   
       query = `
         UPDATE products 
-        SET name = ?, price = ?, stock_quantity = ?, category_id = ?, description = ?, image_url = ? , youtube_url=?
+        SET name = ?, price = ?, stock_quantity = ?, category_id = ?, description = ?, image_url = ?, youtube_url = ?
         WHERE id = ?
       `;
-      queryParams = [name, price, stock_quantity, category_id, description, image_url, youtube_url, id];
+      queryParams = [name, finalPrice, stock_quantity, category_id, description, image_url, youtube_url, id];
     } else {
-      
       query = `
         UPDATE products 
-        SET name = ?, price = ?, stock_quantity = ?, category_id = ?, description = ? , youtube_url = ?
+        SET name = ?, price = ?, stock_quantity = ?, category_id = ?, description = ?, youtube_url = ?
         WHERE id = ?
       `;
-      queryParams = [name, price, stock_quantity, category_id, description, youtube_url,  id];
+      queryParams = [name, finalPrice, stock_quantity, category_id, description, youtube_url, id];
     }
 
     const [result] = await db.query(query, queryParams);
@@ -175,12 +179,19 @@ router.put('/:id', upload.single('image'), async (req, res) => {
       return res.status(404).json({ error: 'المنتج غير موجود' });
     }
 
+    // مسح الكاش من Redis لضمان مزامنة الكميات والسعر فوراً
+    try {
+      const stockKey = `product:stock:${id}`;
+      await redis.del(stockKey);
+    } catch (redisErr) {
+      console.error('Redis deletion error:', redisErr.message);
+    }
+
     res.json({ message: 'تم تحديث البيانات بنجاح' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
-
 
 router.delete('/:id', async (req, res) => {
   try {
@@ -192,6 +203,12 @@ router.delete('/:id', async (req, res) => {
     }
 
     await db.query('DELETE FROM products WHERE id = ?', [id]);
+    try {
+      const stockKey = `product:stock:${id}`;
+      await redis.del(stockKey);
+    } catch (redisErr) {
+      console.error('Redis deletion error on product delete:', redisErr.message);
+    }
 
     if (product[0].image_url && product[0].image_url.startsWith('/images/')) {
       const imageName = path.basename(product[0].image_url);
