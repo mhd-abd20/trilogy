@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { FiMenu, FiX, FiLogOut, FiGrid, FiTag, FiBox, FiShield,FiBarChart2 } from 'react-icons/fi';
+import { FiMenu, FiX, FiLogOut, FiGrid, FiTag, FiBox, FiShield,FiBarChart2  } from 'react-icons/fi';
+import { MdManageAccounts } from "react-icons/md";
+import { LuNotebookPen } from "react-icons/lu";
 import '../styles/adminNavbar.css';
 
 export default function AdminNavbar() {
@@ -69,7 +71,7 @@ export default function AdminNavbar() {
                 className={({ isActive }) => (isActive ? 'nav-item active-link' : 'nav-item')}
                 onClick={closeMenu}
               >
-                <FiBox className="nav-icon" />
+                <MdManageAccounts className="nav-icon" />
                 <span>إدارة اليوزرات</span>
               </NavLink>
               </li>
@@ -101,7 +103,7 @@ export default function AdminNavbar() {
                 className={({ isActive }) => (isActive ? 'nav-item active-link' : 'nav-item')}
                 onClick={closeMenu}
               >
-                <FiBarChart2 className="nav-icon" />
+                <LuNotebookPen className="nav-icon" />
                 <span>سجل المبيعات</span>
               </NavLink>
               
