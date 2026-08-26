@@ -63,6 +63,16 @@ export default function AdminNavbar() {
                 <span>العروض والتخفيضات</span>
               </NavLink>
             </li>
+               <li>
+              <NavLink 
+                to="/manage-users" 
+                className={({ isActive }) => (isActive ? 'nav-item active-link' : 'nav-item')}
+                onClick={closeMenu}
+              >
+                <FiBox className="nav-icon" />
+                <span>إدارة اليوزرات</span>
+              </NavLink>
+              </li>
             <li>
               <NavLink 
                 to="/add-products" 
@@ -73,6 +83,7 @@ export default function AdminNavbar() {
                 <span>إدارة المنتجات</span>
               </NavLink>
               </li>
+
               <li>
               <NavLink 
                 to="/sales-analytics" 

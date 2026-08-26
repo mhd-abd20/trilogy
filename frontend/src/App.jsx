@@ -14,6 +14,7 @@ import ProductsPage from './pages/admin/ProductsPage';
 import LoginPage from './pages/admin/LoginPage';
 import RegisterPage from './pages/admin/RegisterPage';
 import OrdersPage from './pages/admin/OrdersPage';
+import ManageUsersPage from './pages/admin/ManageUsersPage'
 
 import HomePage from './pages/client/HomePage';
 import Products from './pages/client/ProductsPage'; 
@@ -48,6 +49,7 @@ function App() {
           <Route path='/add-products' element={<ProductsPage />} />
           <Route path='/sales-analytics' element={<SalesAnalytics />} />
           <Route path='/orders' element={<OrdersPage />} />
+          <Route path='/manage-users' element={<ManageUsersPage />} />
         </Route>
 
       
