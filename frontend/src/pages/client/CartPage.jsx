@@ -82,6 +82,7 @@ const CartPage = () => {
 
     setLoading(true);
     try {
+      const storedUserId = localStorage.getItem('userId');
       const payload = {
         userId: storedUserId || null,
         items: cart.map((item) => ({
