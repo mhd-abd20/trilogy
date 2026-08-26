@@ -32,7 +32,6 @@ export default function OrderHistory() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isOpen,setisOpen] = useState(false)
   const [openid,setOpenid] = useState()
   const navigate = useNavigate();
 
@@ -90,10 +89,9 @@ export default function OrderHistory() {
     );
   }
 
-  const open = () =>{
-    setisOpen((prev)=>!prev);
-    setOpenid(orders.order_id);
-    console.log("is open:" +{isOpen} + "the id is: " + {openid})
+  const handleToggleOrder = (orderId) =>{
+    setOpenid((prevId) => (prevId === orderId ? null : orderId));
+
   }
 
   return (
@@ -106,7 +104,7 @@ export default function OrderHistory() {
         {orders.map((order) => (
           <div key={order.order_id} className="order-card">
          
-            <div className="order-card-header" onClick={open}>
+            <div className="order-card-header" onClick={() => handleToggleOrder(order.order_id)}>
               <div className="order-meta">
                 <span className="order-id">طلب رقم #{order.order_id}</span>
                 <span className="order-date">{formatTimestamp(order.created_at)}</span>
