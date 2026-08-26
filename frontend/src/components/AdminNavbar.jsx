@@ -84,6 +84,17 @@ export default function AdminNavbar() {
               </NavLink>
               
             </li>
+                <li>
+              <NavLink 
+                to="/orders" 
+                className={({ isActive }) => (isActive ? 'nav-item active-link' : 'nav-item')}
+                onClick={closeMenu}
+              >
+                <FiBarChart2 className="nav-icon" />
+                <span>سجل المبيعات</span>
+              </NavLink>
+              
+            </li>
           </ul>
 
           <button onClick={handleLogout} className="btn-logout">
