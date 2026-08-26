@@ -283,4 +283,35 @@ router.get('/user/:userId', async (req, res) => {
     res.status(500).json({ error: err.message || 'حدث خطأ داخلي في السيرفر' });
   }
 });
+
+router.get('/all-orders', async (req, res) => {
+  try {
+    const query = `
+      SELECT 
+        orders.id AS order_id,
+        orders.total_amount,
+        orders.status,
+        orders.created_at,
+        CASE 
+          WHEN orders.user_id IS NOT NULL THEN 'Client'
+          ELSE 'Guest'
+        END AS user_type,
+        COALESCE(users.name, guests.name) AS customer_name,
+        COALESCE(users.email, guests.email) AS customer_email,
+        COALESCE(users.phone, guests.phone, 'غير متوفر') AS customer_phone
+      FROM orders
+      LEFT JOIN users ON orders.user_id = users.id
+      LEFT JOIN guests ON orders.guest_id = guests.id
+      ORDER BY orders.created_at DESC
+    `;
+
+    const [orders] = await db.query(query);
+    res.json(orders);
+  } catch (error) {
+    console.error('Error fetching orders:', error);
+    res.status(500).json({ message: 'فشل في جلب عمليات الشراء' });
+  }
+});
+
+
 module.exports = router;

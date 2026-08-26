@@ -13,6 +13,8 @@ import Promotions from './pages/admin/Promotions';
 import ProductsPage from './pages/admin/ProductsPage';
 import LoginPage from './pages/admin/LoginPage';
 import RegisterPage from './pages/admin/RegisterPage';
+import OrdersPage from './pages/admin/OrdersPage';
+
 import HomePage from './pages/client/HomePage';
 import Products from './pages/client/ProductsPage'; 
 import CartPage from './pages/client/CartPage'; 
@@ -45,6 +47,7 @@ function App() {
           <Route path='/add-promotions/:id' element={<Promotions />} />
           <Route path='/add-products' element={<ProductsPage />} />
           <Route path='/sales-analytics' element={<SalesAnalytics />} />
+          <Route path='/orders' element={<OrdersPage />} />
         </Route>
 
       
