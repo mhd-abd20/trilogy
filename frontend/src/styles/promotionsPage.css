@@ -10,6 +10,7 @@
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
+/* التنسيق الافتراضي (الوضع الفاتح) */
 .promotions-container h2,
 .promo-details-container h2 {
   font-size: 1.8rem;
@@ -18,9 +19,11 @@
   font-weight: 700;
 }
 
-@media (prefers-color-scheme: dark){
-  .promotions-container h2{
-    color: white;
+/* التنسيق للوضع الداكن (Dark Mode) */
+@media (prefers-color-scheme: dark) {
+  .promotions-container h2,
+  .promo-details-container h2 {
+    color: #ffffff !important; 
   }
 }
 
