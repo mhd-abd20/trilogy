@@ -1,39 +1,39 @@
 import React, { useState, useEffect } from 'react';
-import '../../styles/productsPage.css'; 
+import '../../styles/productsPage.css';
 import imageCompression from 'browser-image-compression';
 import ImageGeneratorInput from '../../components/ImageGeneratorInput';
-import { 
-  getProducts, 
-  createProduct, 
-  updateProduct, 
-  deleteProduct 
+import {
+  getProducts,
+  createProduct,
+  updateProduct,
+  deleteProduct
 } from '../../api/fetchproducts';
 
 import { getCategories } from '../../api/categoryService';
 
 const SERVER_ORIGIN = import.meta.env.VITE_BACKEND_URL;
-const PLACEHOLDER_IMAGE = '/placeholder.png'; 
+const PLACEHOLDER_IMAGE = '/placeholder.png';
 
 const getImageUrl = (imagePath) => {
   if (!imagePath) return PLACEHOLDER_IMAGE;
   if (
-    imagePath.startsWith('http://') || 
-    imagePath.startsWith('https://') || 
+    imagePath.startsWith('http://') ||
+    imagePath.startsWith('https://') ||
     imagePath.startsWith('data:')
   ) {
     return imagePath;
   }
-  
+
   const cleanPath = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
   return `${SERVER_ORIGIN}${cleanPath}`;
 };
 
 const compressImageFile = async (file) => {
   const options = {
-    maxSizeMB: 1,          
-    maxWidthOrHeight: 1200, 
-    useWebWorker: true,    
-    fileType: 'image/jpeg'  
+    maxSizeMB: 1,
+    maxWidthOrHeight: 1200,
+    useWebWorker: true,
+    fileType: 'image/jpeg'
   };
 
   try {
@@ -44,7 +44,7 @@ const compressImageFile = async (file) => {
     return compressedFile;
   } catch (error) {
     console.error('خطأ أثناء ضغط الصورة:', error);
-    return file; 
+    return file;
   }
 };
 
@@ -90,7 +90,6 @@ export default function ProductsPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // دالة التعامل مع استلام الصورة المولدة من المكون الفرعي
   const handleImageGenerated = (generatedUrl) => {
     setImageUrlInput(generatedUrl);
     setImageFile(null); // إلغاء تحديد الملف اليدوي في حال توليد صورة
@@ -101,7 +100,7 @@ export default function ProductsPage() {
 
     const dataToSend = new FormData();
     dataToSend.append('name', formData.name);
-    dataToSend.append('original_price', formData.original_price);
+    dataToSend.append('price', formData.original_price);
     dataToSend.append('stock_quantity', formData.stock_quantity);
     dataToSend.append('category_id', formData.category_id);
     dataToSend.append('description', formData.description);
@@ -175,17 +174,17 @@ export default function ProductsPage() {
   return (
     <div className="products-wrapper">
       <div className="products-container">
-        
+
         {/* الهيدر */}
         <div className="products-header">
           <h2>إدارة المنتجات</h2>
         </div>
-        <p>قم بإضافة وتعديل أو حذف المنتجات من لوحة التحكم</p> 
-        
+        <p>قم بإضافة وتعديل أو حذف المنتجات من لوحة التحكم</p>
+
         {/* نموذج الإضافة والتعديل */}
         <div className="product-form-card">
           <h3>{editId ? 'تعديل بيانات المنتج' : 'إضافة منتج جديد'}</h3>
-          
+
           <form onSubmit={handleSubmit}>
             <div className="form-group">
               <label>اسم المنتج:</label>
@@ -282,8 +281,8 @@ export default function ProductsPage() {
 
             <div className="form-group">
               <label>2. كتابة وصف وتوليد صورة بالذكاء الاصطناعي:</label>
-              <ImageGeneratorInput 
-                onImageGenerated={handleImageGenerated} 
+              <ImageGeneratorInput
+                onImageGenerated={handleImageGenerated}
                 initialUrl={imageUrlInput}
               />
             </div>
@@ -292,7 +291,7 @@ export default function ProductsPage() {
               <button type="submit" className="btn-submit">
                 {editId ? 'حفظ التعديلات' : 'إضافة المنتج'}
               </button>
-              
+
               {editId && (
                 <button type="button" onClick={resetForm} className="btn-cancel">
                   إلغاء
@@ -336,10 +335,10 @@ export default function ProductsPage() {
                   <div className="product-price">
                     ${(Number(p.price || p.original_price || 0)).toFixed(2)}
                   </div>
-                  
+
                   <p className="product-info">
                     المخزون: <strong>{p.stock_quantity}</strong>
-                  </p>  
+                  </p>
 
                   {p.description && (
                     <p className="product-description">
