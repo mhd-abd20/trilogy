@@ -32,7 +32,8 @@ export default function OrderHistory() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isOpen,setisOpen] = useState(true)
+  const [isOpen,setisOpen] = useState(false)
+  const [openid,setOpenid] = useState()
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -91,7 +92,8 @@ export default function OrderHistory() {
 
   const open = () =>{
     setisOpen((prev)=>!prev);
-    console.log(isOpen)
+    setOpenid(orders.order_id);
+    console.log("is open:" +{isOpen} + "the id is: " + {openid})
   }
 
   return (
@@ -117,7 +119,7 @@ export default function OrderHistory() {
 
            
             <div className="order-items-list">
-              {order.items && order.items.map((item) => (
+              {openid == order.order_id && order.items.map((item) => (
                 <div key={item.item_id} className="order-item">
                   <div className="item-image-wrapper">
                     <img 
