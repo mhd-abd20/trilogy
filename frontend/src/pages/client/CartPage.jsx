@@ -83,6 +83,7 @@ const CartPage = () => {
     setLoading(true);
     try {
       const payload = {
+        userId: storedUserId || null,
         items: cart.map((item) => ({
           productId: item.id || item.product_id,
           quantity: item.quantity,

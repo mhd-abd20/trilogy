@@ -12,6 +12,8 @@ redis.on('connect', () => {
 redis.on('error', (err) => {
   console.error('Redis Connection Error:', err);
 });
+
+
 router.post('/checkout', async (req, res) => {
   const { items, totalAmount, userId } = req.body;
 
