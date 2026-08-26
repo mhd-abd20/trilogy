@@ -253,14 +253,18 @@
   margin-bottom: 8px;
 }
 
+/* تنسيق نص المعلومات (المخزون / الكمية المتوفرة) */
 .product-info {
-  font-size: 0.85rem;
-  color: #94a3b8;
-  margin: 4px 0;
+  color: #94a3b8; /* لون رمادي فاتح مريح للعين */
+  font-size: 0.95rem;
+  margin-top: 8px;
+  margin-bottom: 8px;
 }
 
+/* تنسيق رقم الكمية المتوفرة لجعلها بارزة وواضحة */
 .product-info strong {
-  color: #cbd5e1;
+  color: #f8fafc; /* لون أبيض ناصع ليظهر بوضوح في الوضع الداكن */
+  font-weight: 600;
 }
 
 .product-description {
