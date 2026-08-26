@@ -32,13 +32,11 @@ export default function OrderHistory() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isOpen,setisOpen] = useState(true)
   const navigate = useNavigate();
 
   useEffect(() => {
-  
     const userId = localStorage.getItem('userId');
-
-    
     if (!userId) {
       setError('يرجى تسجيل الدخول لعرض تاريخ طلباتك.');
       setLoading(false);
@@ -91,6 +89,10 @@ export default function OrderHistory() {
     );
   }
 
+  const open = () =>{
+    setisOpen((prev)=>!prev);
+    console.log(isOpen)
+  }
 
   return (
     <div className="history-container">
@@ -102,7 +104,7 @@ export default function OrderHistory() {
         {orders.map((order) => (
           <div key={order.order_id} className="order-card">
          
-            <div className="order-card-header">
+            <div className="order-card-header" onClick={open}>
               <div className="order-meta">
                 <span className="order-id">طلب رقم #{order.order_id}</span>
                 <span className="order-date">{formatTimestamp(order.created_at)}</span>

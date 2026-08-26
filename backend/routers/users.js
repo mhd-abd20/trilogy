@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 
-// 1. جلب كافة المستخدمين
+
 router.get('/', async (req, res) => {
   try {
     const [users] = await db.query(
@@ -14,6 +14,18 @@ router.get('/', async (req, res) => {
     res.status(500).json({ message: 'فشل في جلب قائمة المستخدمين' });
   }
 });
+
+router.get('/:id',async(req,res)=>{
+    const { id } = req.params;
+    try{
+      query=`SELECT * FROM users WHERE id=?`
+        const [rows] = await db.query(query,[id]);
+        res.json(rows[0]);
+    }
+    catch(err){
+        res.status(500).json({ error: err.message });
+    }
+})
 
 // 2. تحديث بيانات ودور المستخدم
 router.put('/:id', async (req, res) => {
