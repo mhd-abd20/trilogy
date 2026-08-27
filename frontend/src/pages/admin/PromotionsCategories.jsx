@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { getPromotions, createPromotion, togglePromotionActive } from '../../api/fetchpromotions';
+// 🔹 إضافة deletePromotion لاستدعاءات الـ API
+import { getPromotions, createPromotion, togglePromotionActive, deletePromotion } from '../../api/fetchpromotions';
 import { useNavigate } from "react-router-dom";
 import '../../styles/promotions.css';
 
@@ -48,7 +49,7 @@ const PromotionsCategories = () => {
 
     setFormData((prev) => {
       const updated = { ...prev, [name]: val };
-     
+      
       if (name === 'start_date' && updated.end_date && updated.end_date <= value) {
         updated.end_date = '';
       }
@@ -76,10 +77,9 @@ const PromotionsCategories = () => {
     }
   };
 
-  
   const handleToggleActive = async (id, currentStatus) => {
     const newStatus = currentStatus === 1 ? 0 : 1;
-   
+    
     setPromotions((prev) =>
       prev.map((p) => (p.id === id ? { ...p, is_active: newStatus } : p))
     );
@@ -89,6 +89,20 @@ const PromotionsCategories = () => {
     } catch (err) {
       alert('فشل تحديث حالة العرض');
       fetchPromotions(); 
+    }
+  };
+
+  // 🔹 دالة حذف العرض
+  const handleDeletePromotion = async (id, title) => {
+    if (!window.confirm(`هل أنت تأكد من إزالة العرض "${title}"؟`)) return;
+
+    try {
+      await deletePromotion(id);
+      // تحديث الحالة محلّياً بحذف العنصر فوراً
+      setPromotions((prev) => prev.filter((p) => p.id !== id));
+    } catch (err) {
+      alert('خطأ أثناء حذف العرض: ' + err.message);
+      fetchPromotions();
     }
   };
 
@@ -110,7 +124,6 @@ const PromotionsCategories = () => {
 
         {error && <div className="error-box">{error}</div>}
 
-       
         <form onSubmit={handleCreatePromotion} className="promo-form">
           <h3>+ إضافة عرض جديد</h3>
           
@@ -169,7 +182,6 @@ const PromotionsCategories = () => {
           </button>
         </form>
 
-        
         <div className="promo-grid">
           {promotions.length === 0 ? (
             <p className="no-data">لا توجد عروضات حالياً.</p>
@@ -193,8 +205,8 @@ const PromotionsCategories = () => {
                     <p><strong>إلى:</strong> {p.end_date ? p.end_date.split('T')[0] : 'غير حدد'}</p>
                   </div>
 
-                  {/* ⚡ مفتاح الـ Toggle لتغيير is_active + زر التفاصيل */}
-                  <div className="card-actions">
+                  {/* ⚡ مفتاح الـ Toggle + زر التفاصيل + زر الحذف */}
+                  <div className="card-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
                     <label className="toggle-switch">
                       <input
                         type="checkbox"
@@ -211,6 +223,22 @@ const PromotionsCategories = () => {
                       onClick={() => navigate(`/add-promotions/${p.id}`)}
                     >
                       التفاصيل ➔
+                    </button>
+
+                    {/* 🔹 زر حذف العرض */}
+                    <button 
+                      className="btn-delete"
+                      onClick={() => handleDeletePromotion(p.id, p.title)}
+                      style={{
+                        backgroundColor: '#dc3545',
+                        color: '#fff',
+                        border: 'none',
+                        padding: '6px 12px',
+                        borderRadius: '4px',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      حذف 🗑️
                     </button>
                   </div>
 

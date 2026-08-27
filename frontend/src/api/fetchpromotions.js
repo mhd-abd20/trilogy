@@ -24,7 +24,18 @@ export const togglePromotionActive = async (id, isActive) => {
     body: JSON.stringify({ is_active: isActive ? 1 : 0 }),
   });
 };
+export const deletePromotion = async (id) => {
+  const response = await fetch(`${SERVER_ORIGIN}/api/promotions/${id}`, {
+    method: 'DELETE',
+  });
+  
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || 'فشل حذف العرض');
+  }
 
+  return await response.json();
+};
 export const addProductToPromotion = async (promotionId, productId, discountPercentage) => {
  
   return await customFetch(`/promotions/${promotionId}/products`, {

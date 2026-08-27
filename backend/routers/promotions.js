@@ -136,7 +136,24 @@ router.post('/:id/products', async (req, res) => {
   }
 });
 
-// إزالة منتج محدد من عرض محدد
+router.delete('/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const [result] = await db.query("DELETE FROM promotions WHERE id = ?", [id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'العرض غير موجود' });
+    }
+
+    res.json({ message: 'تم حذف العرض بنجاح' });
+  } catch (err) {
+    console.error('Error deleting promotion:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 router.delete('/:id/products/:productId', async (req, res) => {
   try {
     const { id, productId } = req.params;
