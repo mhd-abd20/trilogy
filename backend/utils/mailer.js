@@ -1,18 +1,20 @@
 const nodemailer = require('nodemailer');
 const dns = require('dns');
 
-// 🔹 إجبار السيرفر على استخدام IPv4 فقط وتجنب IPv6
-dns.setDefaultResultOrder('ipv4first');
+// 🔹 إجبار النظام محلياً وفي الـ DNS على حل IPv4 أولاً
+if (dns.setDefaultResultOrder) {
+  dns.setDefaultResultOrder('ipv4first');
+}
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 587,
-  secure: false, // يجب أن تكون false مع المنفذ 587 (يستخدم STARTTLS بدلاً منها)
+  secure: false, // يجب أن تكون false مع 587
+  family: 4,     // 👈 إجبار Nodemailer بشكل صارم على استخدام IPv4 فقط
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
   },
-  // 🔹 إضافة إعدادات الشبكة لمنع مشاكل شهادات SSL والربط في البيئات السحابية
   tls: {
     rejectUnauthorized: false
   }
@@ -35,7 +37,7 @@ const sendPromotionNotification = async (userEmails, promoTitle) => {
 
   try {
     const info = await transporter.sendMail(mailOptions);
-    console.log('✅ تم إرسال الإيميلات بنجاح! ID:', info.messageId);
+    console.log('✅ تم إرسال البريد بنجاح! ID:', info.messageId);
   } catch (error) {
     console.error('❌ خطأ في إرسال البريد الإلكتروني:', error);
   }
