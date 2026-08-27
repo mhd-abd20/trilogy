@@ -52,8 +52,19 @@ router.put('/:id', async (req, res) => {
 
 router.put('/:id/subscribe', async (req, res) => {
   const { id } = req.params;
-  await db.query('UPDATE users SET subscribe_to_newsletter = true WHERE id = ?', [id]);
-  res.json({ message: 'Subscribed successfully' });
+  try {
+    const updateSql = `UPDATE users SET subscribe_to_newsletter = TRUE WHERE id = ?`;
+    const [result] = await db.query(updateSql, [id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'المستخدم غير موجود' });
+    }
+
+    res.json({ message: 'تم الاشتراك بنجاح', success: true });
+  } catch (error) {
+    console.error('Newsletter subscribe error:', error);
+    res.status(500).json({ error: error.message });
+  }
 });
 
 

@@ -30,7 +30,7 @@ export default function OrderHistory() {
   const [error, setError] = useState(null);
   const [openid, setOpenid] = useState();
   
-  // 🔹 حالة الاشتراك في النشرة البريدية
+  // 🔹 حالة الاشتراك بالنشرة البريدية
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [subscribing, setSubscribing] = useState(false);
 
@@ -46,16 +46,15 @@ export default function OrderHistory() {
 
     const fetchData = async () => {
       try {
-        // جلب الطلبات وجلب بيانات المستخدم معاً
         const [ordersRes, userRes] = await Promise.all([
           axios.get(`${SERVER_ORIGIN}/api/orders/user/${userId}`),
-          axios.get(`${SERVER_ORIGIN}/api/users/${userId}`) // يرجى التأكد من مسار الـ endpoint ببيانات المستخدم
+          axios.get(`${SERVER_ORIGIN}/api/users/${userId}`)
         ]);
 
         setOrders(ordersRes.data || []);
         
-        // ضبط حالة الاشتراك من الداتا بيز
-        if (userRes.data && userRes.data.subscribe_to_newsletter) {
+        // التأكد من جلب قيمة subscribe_to_newsletter (سواء كانت 1 أو true)
+        if (userRes.data && (userRes.data.subscribe_to_newsletter === 1 || userRes.data.subscribe_to_newsletter === true)) {
           setIsSubscribed(true);
         }
       } catch (err) {
@@ -69,21 +68,20 @@ export default function OrderHistory() {
     fetchData();
   }, [navigate]);
 
-  // 🔹 دالة الاشتراك بالنشرة البريدية
   const handleSubscribe = async () => {
     const userId = localStorage.getItem('userId');
     if (!userId) return;
 
     try {
       setSubscribing(true);
-      await axios.put(`${SERVER_ORIGIN}/api/users/${userId}/subscribe`, {
-        subscribe_to_newsletter: true
-      });
-      setIsSubscribed(true); // تخفي الزر فوراً
-      alert('تم الاشتراك في قائمة العروض والخصومات بنجاح!');
+      const res = await axios.put(`${SERVER_ORIGIN}/api/users/${userId}/subscribe`);
+      if (res.data.success || res.status === 200) {
+        setIsSubscribed(true); // إخفاء الزر فوراً
+        alert('تم الاشتراك في خدمة العروض والخصومات بنجاح!');
+      }
     } catch (err) {
       console.error('Error subscribing:', err);
-      alert('حدث خطأ أثناء الاتصال بالسيرفر.');
+      alert('حدث خطأ أثناء الاتصال بالسيرفر: ' + (err.response?.data?.error || err.message));
     } finally {
       setSubscribing(false);
     }
@@ -115,7 +113,7 @@ export default function OrderHistory() {
   return (
     <div className="history-container">
       
-      {/* 🔹 كارت الإشعار والزر للـ Newsletter (يظهر فقط إذا كان غير مشترك) */}
+      {/* 🔹 بانر الاشتراك - يختفي تلقائياً بمجرد الاشتراك */}
       {!isSubscribed && (
         <div className="newsletter-banner" style={{
           backgroundColor: '#f8f9fa',
