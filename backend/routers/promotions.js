@@ -74,14 +74,14 @@ router.post('/', async (req, res) => {
 
     // 🔹 1. جلب إيميلات المستخدمين المشتركين بالـ Newsletter
     const [subscribers] = await db.query(
-      "SELECT email FROM users WHERE subscribe_to_newsletter = TRUE AND email IS NOT NULL AND email != ''"
+      "SELECT email FROM users WHERE (subscribe_to_newsletter = TRUE OR subscribe_to_newsletter = 1) AND email IS NOT NULL AND email != ''"
     );
 
     const emailList = subscribers.map((u) => u.email);
 
     // 🔹 2. استدعاء دالة الإرسال التلقائي
     if (emailList.length > 0) {
-      sendPromotionNotification(emailList, title);
+      await sendPromotionNotification(emailList, title);
     }
 
     res.status(201).json({ message: 'تمت إضافة العرض بنجاح وإشعار المشتركين', id: result.insertId });
@@ -89,21 +89,6 @@ router.post('/', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
-router.patch('/:id/toggle-active', async (req, res) => {
-  const { id } = req.params;
-  const { is_active } = req.body;
-
-  try {
-    await db.query("UPDATE promotions SET is_active = ? WHERE id = ?", [is_active, id]);
-    res.json({ message: 'تم تحديث حالة العرض بنجاح', is_active });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-
-
 
 router.patch('/:id/toggle-active', async (req, res) => {
   const { id } = req.params;

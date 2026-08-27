@@ -1,4 +1,5 @@
 // utils/mailer.js
+require('dotenv').config();
 const nodemailer = require('nodemailer');
 
 // إعداد خادم الإرسال
@@ -16,6 +17,7 @@ const sendPromotionNotification = async (userEmails, promoTitle) => {
 
   const mailOptions = {
     from: `"متجرنا الإلكتروني" <${process.env.EMAIL_USER}>`,
+    to: process.env.EMAIL_USER,
     bcc: userEmails, // الإرسال للجميع دفعة واحدة وبسرية
     subject: `🔥 عرض جديد: ${promoTitle}`,
     html: `
