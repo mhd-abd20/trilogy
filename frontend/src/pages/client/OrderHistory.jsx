@@ -80,6 +80,7 @@ export default function OrderHistory() {
       <div className="history-container">
         <div className="history-header">
           <h2>تاريخ طلباتي</h2>
+          <p>test</p>
         </div>
         <div className="state-message empty-state">
           <p>لم تقم بأي عمليات شراء حتى الآن.</p>
