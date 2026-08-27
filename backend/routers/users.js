@@ -27,7 +27,6 @@ router.get('/:id',async(req,res)=>{
     }
 })
 
-// 2. تحديث بيانات ودور المستخدم
 router.put('/:id', async (req, res) => {
   const { id } = req.params;
   const { name, email, phone, address, role } = req.body;
@@ -51,7 +50,14 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// 3. حذف مستخدم (اختياري)
+router.put('/:id/subscribe', async (req, res) => {
+  const { id } = req.params;
+  await db.query('UPDATE users SET subscribe_to_newsletter = true WHERE id = ?', [id]);
+  res.json({ message: 'Subscribed successfully' });
+});
+
+
+
 router.delete('/:id', async (req, res) => {
   const { id } = req.params;
   try {

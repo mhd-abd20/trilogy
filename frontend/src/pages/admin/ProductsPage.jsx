@@ -1,366 +1,202 @@
 import React, { useState, useEffect } from 'react';
-import '../../styles/productsPage.css';
-import imageCompression from 'browser-image-compression';
-import ImageGeneratorInput from '../../components/ImageGeneratorInput';
-import {
-  getProducts,
-  createProduct,
-  updateProduct,
-  deleteProduct
-} from '../../api/fetchproducts';
+import axios from 'axios';
+import { Link, useNavigate } from 'react-router-dom';
+import '../../styles/OrderHistory.css'; 
 
-import { getCategories } from '../../api/categoryService';
+const SERVER_ORIGIN = import.meta.env.VITE_BACKEND_URL; 
 
-const SERVER_ORIGIN = import.meta.env.VITE_BACKEND_URL;
-const PLACEHOLDER_IMAGE = '/placeholder.png';
+const formatTimestamp = (timestamp) => {
+  const date = new Date(timestamp);
+  return date.toLocaleDateString('ar-EG', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+};
 
 const getImageUrl = (imagePath) => {
-  if (!imagePath) return PLACEHOLDER_IMAGE;
-  if (
-    imagePath.startsWith('http://') ||
-    imagePath.startsWith('https://') ||
-    imagePath.startsWith('data:')
-  ) {
+  if (imagePath.startsWith('http://') || imagePath.startsWith('https://') || imagePath.startsWith('data:')) {
     return imagePath;
   }
-
   const cleanPath = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
   return `${SERVER_ORIGIN}${cleanPath}`;
 };
 
-const compressImageFile = async (file) => {
-  const options = {
-    maxSizeMB: 1,
-    maxWidthOrHeight: 1200,
-    useWebWorker: true,
-    fileType: 'image/jpeg'
-  };
-
-  try {
-    const compressedBlob = await imageCompression(file, options);
-    const compressedFile = new File([compressedBlob], file.name || `compressed_${Date.now()}.jpg`, {
-      type: compressedBlob.type,
-    });
-    return compressedFile;
-  } catch (error) {
-    console.error('خطأ أثناء ضغط الصورة:', error);
-    return file;
-  }
-};
-
-export default function ProductsPage() {
-  const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
+export default function OrderHistory() {
+  const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [openid, setOpenid] = useState();
+  
+  // 🔹 حالة الاشتراك في النشرة البريدية
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [subscribing, setSubscribing] = useState(false);
 
-  const [formData, setFormData] = useState({
-    name: '',
-    original_price: '',
-    stock_quantity: '',
-    category_id: '',
-    description: '',
-    youtube_url: '',
-  });
-
-  const [imageFile, setImageFile] = useState(null);
-  const [imageUrlInput, setImageUrlInput] = useState('');
-  const [editId, setEditId] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = async () => {
-    setLoading(true);
-    try {
-      const [productsData, categoriesData] = await Promise.all([
-        getProducts(),
-        getCategories()
-      ]);
-      setProducts(productsData || []);
-      setCategories(categoriesData || []);
-    } catch (err) {
-      console.error('خطأ أثناء جلب البيانات:', err.message);
-    } finally {
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      setError('يرجى تسجيل الدخول لعرض تاريخ طلباتك.');
       setLoading(false);
-    }
-  };
-
-  const handleInputChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleImageGenerated = (generatedUrl) => {
-    setImageUrlInput(generatedUrl);
-    setImageFile(null); // إلغاء تحديد الملف اليدوي في حال توليد صورة
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const dataToSend = new FormData();
-    dataToSend.append('name', formData.name);
-    dataToSend.append('price', formData.original_price);
-    dataToSend.append('stock_quantity', formData.stock_quantity);
-    dataToSend.append('category_id', formData.category_id);
-    dataToSend.append('description', formData.description);
-    dataToSend.append('youtube_url', formData.youtube_url);
-
-    if (imageFile) {
-      const compressed = await compressImageFile(imageFile);
-      dataToSend.append('image', compressed);
-    } else if (imageUrlInput) {
-      dataToSend.append('image_url', imageUrlInput);
+      return;
     }
 
-    try {
-      if (editId) {
-        await updateProduct(editId, dataToSend);
-      } else {
-        await createProduct(dataToSend);
+    const fetchData = async () => {
+      try {
+        // جلب الطلبات وجلب بيانات المستخدم معاً
+        const [ordersRes, userRes] = await Promise.all([
+          axios.get(`${SERVER_ORIGIN}/api/orders/user/${userId}`),
+          axios.get(`${SERVER_ORIGIN}/api/users/${userId}`) // يرجى التأكد من مسار الـ endpoint ببيانات المستخدم
+        ]);
+
+        setOrders(ordersRes.data || []);
+        
+        // ضبط حالة الاشتراك من الداتا بيز
+        if (userRes.data && userRes.data.subscribe_to_newsletter) {
+          setIsSubscribed(true);
+        }
+      } catch (err) {
+        console.error('Error fetching data:', err);
+        setError(err.response?.data?.error || 'حدث خطأ أثناء تحميل تاريخ الطلبات.');
+      } finally {
+        setLoading(false);
       }
+    };
 
-      resetForm();
-      const updatedProducts = await getProducts();
-      setProducts(updatedProducts);
-    } catch (err) {
-      alert(`خطأ: ${err.message}`);
-    }
-  };
+    fetchData();
+  }, [navigate]);
 
-  const handleEditClick = (product) => {
-    setEditId(product.id);
-    setFormData({
-      name: product.name || '',
-      original_price: product.original_price || '',
-      stock_quantity: product.stock_quantity || '',
-      category_id: product.category_id || '',
-      description: product.description || '',
-      youtube_url: product.youtube_url || '',
-    });
+  // 🔹 دالة الاشتراك بالنشرة البريدية
+  const handleSubscribe = async () => {
+    const userId = localStorage.getItem('userId');
+    if (!userId) return;
 
-    if (product.image_url && (product.image_url.startsWith('http://') || product.image_url.startsWith('https://') || product.image_url.startsWith('data:'))) {
-      setImageUrlInput(product.image_url);
-    } else {
-      setImageUrlInput('');
-    }
-    setImageFile(null);
-  };
-
-  const handleDelete = async (id) => {
-    if (!window.confirm('هل أنت تأكد من حذف هذا المنتج؟')) return;
     try {
-      await deleteProduct(id);
-      setProducts(products.filter((p) => p.id !== id));
+      setSubscribing(true);
+      await axios.put(`${SERVER_ORIGIN}/api/users/${userId}/subscribe`, {
+        subscribe_to_newsletter: true
+      });
+      setIsSubscribed(true); // تخفي الزر فوراً
+      alert('تم الاشتراك في قائمة العروض والخصومات بنجاح!');
     } catch (err) {
-      alert(`فشل الحذف: ${err.message}`);
+      console.error('Error subscribing:', err);
+      alert('حدث خطأ أثناء الاتصال بالسيرفر.');
+    } finally {
+      setSubscribing(false);
     }
   };
 
-  const resetForm = () => {
-    setFormData({
-      name: '',
-      original_price: '',
-      stock_quantity: '',
-      category_id: '',
-      description: '',
-      youtube_url: '',
-    });
-    setImageFile(null);
-    setImageUrlInput('');
-    setEditId(null);
+  if (loading) {
+    return (
+      <div className="history-container">
+        <div className="state-message">جاري تحميل تاريخ الطلبات...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="history-container">
+        <div className="state-message error-state">
+          <p>{error}</p>
+          <Link to="/products" className="btn-primary">الذهاب للمتجر</Link>
+        </div>
+      </div>
+    );
+  }
+
+  const handleToggleOrder = (orderId) => {
+    setOpenid((prevId) => (prevId === orderId ? null : orderId));
   };
 
   return (
-    <div className="products-wrapper">
-      <div className="products-container">
-
-        {/* الهيدر */}
-        <div className="products-header">
-          <h2>إدارة المنتجات</h2>
-        </div>
-        <p>قم بإضافة وتعديل أو حذف المنتجات من لوحة التحكم</p>
-
-        {/* نموذج الإضافة والتعديل */}
-        <div className="product-form-card">
-          <h3>{editId ? 'تعديل بيانات المنتج' : 'إضافة منتج جديد'}</h3>
-
-          <form onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label>اسم المنتج:</label>
-              <input
-                type="text"
-                name="name"
-                placeholder="مثال: سماعة لاسلكية"
-                value={formData.name}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-
-            <div className="form-grid">
-              <div className="form-group">
-                <label>السعر ($):</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  name="original_price"
-                  placeholder="0.00"
-                  value={formData.original_price}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label>الكمية المتوفرة:</label>
-                <input
-                  type="number"
-                  name="stock_quantity"
-                  placeholder="0"
-                  value={formData.stock_quantity}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label>الفئة:</label>
-              <select
-                name="category_id"
-                value={formData.category_id}
-                onChange={handleInputChange}
-                required
-              >
-                <option value="">-- اختر الفئة --</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label>وصف المنتج:</label>
-              <textarea
-                name="description"
-                placeholder="تفاصيل المنتج..."
-                value={formData.description}
-                onChange={handleInputChange}
-                rows="3"
-              />
-            </div>
-
-            <div className="form-group">
-              <label>رابط يوتيوب:</label>
-              <textarea
-                name="youtube_url"
-                placeholder="مقطع يوتيوب توضيحي..."
-                value={formData.youtube_url}
-                onChange={handleInputChange}
-                rows="3"
-              />
-            </div>
-
-            <div className="form-group">
-              <label>1. رفع صورة من الجهاز:</label>
-              <input
-                type="file"
-                accept="image/*"
-                capture="environment"
-                onChange={(e) => {
-                  setImageFile(e.target.files[0]);
-                  if (e.target.files[0]) setImageUrlInput(''); // مسح رابط الصورة المولد إذا تم رفع ملف
-                }}
-              />
-            </div>
-
-            <div className="form-divider">أو</div>
-
-            <div className="form-group">
-              <label>2. كتابة وصف وتوليد صورة بالذكاء الاصطناعي:</label>
-              <ImageGeneratorInput
-                onImageGenerated={handleImageGenerated}
-                initialUrl={imageUrlInput}
-              />
-            </div>
-
-            <div className="form-actions">
-              <button type="submit" className="btn-submit">
-                {editId ? 'حفظ التعديلات' : 'إضافة المنتج'}
-              </button>
-
-              {editId && (
-                <button type="button" onClick={resetForm} className="btn-cancel">
-                  إلغاء
-                </button>
-              )}
-            </div>
-          </form>
-        </div>
-
-        {/* شبكة قائمة المنتجات */}
-        <div className="products-header">
-          <h2>قائمة المنتجات المتاحة</h2>
-        </div>
-
-        {loading ? (
-          <p className="loading-text">جاري تحميل البيانات...</p>
-        ) : products.length === 0 ? (
-          <p className="empty-text">لا يوجد منتجات حالياً.</p>
-        ) : (
-          <div className="products-grid">
-            {products.map((p) => (
-              <div key={p.id} className="product-card">
-                <div>
-                  <div className="product-image-container">
-                    <img
-                      src={getImageUrl(p.image_url)}
-                      alt={p.name}
-                      className="product-image"
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = PLACEHOLDER_IMAGE;
-                      }}
-                    />
-                  </div>
-
-                  <span className="category-badge">
-                    {p.cname || 'بدون فئة'}
-                  </span>
-
-                  <h3 className="product-title">{p.name}</h3>
-                  <div className="product-price">
-                    ${(Number(p.price || p.original_price || 0)).toFixed(2)}
-                  </div>
-
-                  <p className="product-info">
-                    المخزون: <strong>{p.stock_quantity}</strong>
-                  </p>
-
-                  {p.description && (
-                    <p className="product-description">
-                      {p.description}
-                    </p>
-                  )}
-                </div>
-
-                <div className="card-actions">
-                  <button onClick={() => handleEditClick(p)} className="btn-edit">
-                    تعديل
-                  </button>
-                  <button onClick={() => handleDelete(p.id)} className="btn-delete">
-                    حذف
-                  </button>
-                </div>
-              </div>
-            ))}
+    <div className="history-container">
+      
+      {/* 🔹 كارت الإشعار والزر للـ Newsletter (يظهر فقط إذا كان غير مشترك) */}
+      {!isSubscribed && (
+        <div className="newsletter-banner" style={{
+          backgroundColor: '#f8f9fa',
+          border: '1px solid #e2e8f0',
+          padding: '15px 20px',
+          borderRadius: '8px',
+          marginBottom: '20px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: '15px',
+          flexWrap: 'wrap'
+        }}>
+          <div>
+            <h4 style={{ margin: '0 0 5px 0' }}>💡 هل تحب العروض والخصومات؟</h4>
+            <p style={{ margin: 0, color: '#6c757d', fontSize: '0.9rem' }}>
+              اشترك الآن ليصلك أحدث العروض الحصرية مباشرة على بريدك الإلكتروني.
+            </p>
           </div>
-        )}
+          <button 
+            className="btn-primary" 
+            onClick={handleSubscribe} 
+            disabled={subscribing}
+            style={{ padding: '8px 16px', cursor: 'pointer' }}
+          >
+            {subscribing ? 'جاري الاشتراك...' : 'اشترك في العروض'}
+          </button>
+        </div>
+      )}
 
+      <div className="history-header">
+        <h2>تاريخ طلباتي ({orders.length})</h2>
       </div>
+
+      {orders.length === 0 ? (
+        <div className="state-message empty-state">
+          <p>لم تقم بأي عمليات شراء حتى الآن.</p>
+          <Link to="/products" className="btn-primary">ابدأ التسوق الآن</Link>
+        </div>
+      ) : (
+        <div className="orders-list">
+          {orders.map((order) => (
+            <div key={order.order_id} className="order-card">
+              <div className="order-card-header" onClick={() => handleToggleOrder(order.order_id)}>
+                <div className="order-meta">
+                  <span className="order-id">طلب رقم #{order.order_id}</span>
+                  <span className="order-date">{formatTimestamp(order.created_at)}</span>
+                </div>
+                <div className="order-total-section">
+                  <span className="total-label">إجمالي الطلب</span>
+                  <span className="total-price">${Number(order.total_amount).toFixed(2)}</span>
+                </div>
+              </div>
+
+              <div className="order-items-list">
+                {openid === order.order_id && order.items.map((item) => (
+                  <div key={item.item_id} className="order-item">
+                    <div className="item-image-wrapper">
+                      <img 
+                        src={getImageUrl(item.image_url)} 
+                        alt={item.product_name} 
+                      />
+                    </div>
+                    <div className="item-details">
+                      <div className="item-name-info">
+                        <h4>{item.product_name}</h4>
+                        <span className="item-qty-price">
+                          ${Number(item.unit_price).toFixed(2)} × {item.quantity}
+                        </span>
+                      </div>
+                      <div className="item-price-calc">
+                        ${(Number(item.unit_price) * item.quantity).toFixed(2)}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
