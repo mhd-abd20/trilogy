@@ -38,7 +38,7 @@ const PromotionDetails = () => {
 
   return (
     <div className="promo-details-container" style={{ padding: '20px' }}>
-      <Link to="/promotions" style={{ textDecoration: 'none', color: '#3182ce' }}>
+      <Link to="/add-promotions" style={{ textDecoration: 'none', color: '#3182ce' }}>
         ← العودة لكافة العروض
       </Link>
 

@@ -76,7 +76,16 @@ const Promotions = () => {
   );
 
 
+
   const filteredAllProducts = allproducts.filter((p) => {
+    const isAddedInCurrentPromo = products.some(
+      (promoP) => promoP.id === p.id || promoP.product_id === p.id
+    );
+    if (isAddedInCurrentPromo) return false;
+
+    const isAlreadyInActivePromo = p.discount_percentage !== null || p.promotion_title !== null;
+    if (isAlreadyInActivePromo) return false;
+
     if (selectedCategory === "all") return true;
     return p.cname === selectedCategory;
   });
@@ -171,7 +180,7 @@ const Promotions = () => {
                   return (
                     <tr key={p.id}>
                       <td data-label="اسم المنتج">{p.name}</td>
-                      <td data-label="السعر الأصلي">${p.price}</td>
+                      <td data-label="السعر الأصلي">${p.original_price}</td>
                       <td data-label="نسبة الخصم">
                         {!isAdded ? (
                           <input

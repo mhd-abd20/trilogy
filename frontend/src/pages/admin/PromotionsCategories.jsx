@@ -208,7 +208,7 @@ const PromotionsCategories = () => {
 
                     <button 
                       className="btn-details"
-                      onClick={() => navigate(`/promotions/${p.id}`)}
+                      onClick={() => navigate(`/add-promotions/${p.id}`)}
                     >
                       التفاصيل ➔
                     </button>
