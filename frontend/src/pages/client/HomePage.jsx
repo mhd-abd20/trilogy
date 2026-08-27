@@ -63,7 +63,7 @@ const HomePage = () => {
       <div className="cta-inner">
           <h2>تتبع عمليات الشراء </h2>
           <p>بإنشائك حساب في متجرنا يمكن تتبع جميع عمليات الشراء التي تقوم بها وتلقي اشعارات لكل عروضاتنا الجديدة</p>
-          <Link to="/login" className="btn btn-cta"> متشرياتي</Link>
+          <Link to="/order-history" className="btn btn-cta"> متشرياتي</Link>
         </div>
        ):(
            <div className="cta-inner">
