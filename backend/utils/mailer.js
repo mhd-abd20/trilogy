@@ -1,4 +1,8 @@
 // utils/mailer.js
+const dns = require('dns');
+try {
+  dns.setDefaultResultOrder('ipv4first');
+} catch (e) {}
 require('dotenv').config();
 const nodemailer = require('nodemailer');
 
@@ -6,7 +10,9 @@ const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 465,
   secure: true,
-  family: 4, // ⚡ إجبار النود على استخدام IPv4 لمنع خطأ ENETUNREACH في Railway
+  lookup: (hostname, options, callback) => {
+    return dns.lookup(hostname, { family: 4 }, callback);
+  },
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
