@@ -7,7 +7,7 @@ const sendPromotionNotification = async (userEmails, promoTitle) => {
   if (!userEmails || userEmails.length === 0) return;
 
   try {
-    // 🔹 إرسال البريد عبر HTTP API (يتجاوز قيود Railway بالكامل)
+
     const data = await resend.emails.send({
       from: 'Acme <onboarding@resend.dev>', // النطاق التجريبي المجاني الموفر من Resend
       to: userEmails,
