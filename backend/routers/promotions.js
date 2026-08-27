@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
-
+const { sendPromotionNotification } = require('../utils/mailer');
 
 router.get('/', async (req, res) => {
   try {
@@ -58,8 +58,6 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-
-
 router.post('/', async (req, res) => {
   const { title, start_date, end_date, is_active } = req.body;
 
@@ -73,7 +71,20 @@ router.post('/', async (req, res) => {
       "INSERT INTO promotions (title, start_date, end_date, is_active) VALUES (?, ?, ?, ?)",
       [title, start_date, end_date, activeState]
     );
-    res.status(201).json({ message: 'تمت إضافة العرض بنجاح', id: result.insertId });
+
+    // 🔹 1. جلب إيميلات المستخدمين المشتركين بالـ Newsletter
+    const [subscribers] = await db.query(
+      "SELECT email FROM users WHERE subscribe_to_newsletter = TRUE AND email IS NOT NULL AND email != ''"
+    );
+
+    const emailList = subscribers.map((u) => u.email);
+
+    // 🔹 2. استدعاء دالة الإرسال التلقائي
+    if (emailList.length > 0) {
+      sendPromotionNotification(emailList, title);
+    }
+
+    res.status(201).json({ message: 'تمت إضافة العرض بنجاح وإشعار المشتركين', id: result.insertId });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -91,6 +102,20 @@ router.patch('/:id/toggle-active', async (req, res) => {
   }
 });
 
+
+
+
+router.patch('/:id/toggle-active', async (req, res) => {
+  const { id } = req.params;
+  const { is_active } = req.body;
+
+  try {
+    await db.query("UPDATE promotions SET is_active = ? WHERE id = ?", [is_active, id]);
+    res.json({ message: 'تم تحديث حالة العرض بنجاح', is_active });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 router.post('/:id/products', async (req, res) => {
   try {
