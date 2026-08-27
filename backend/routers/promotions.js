@@ -57,7 +57,6 @@ router.get('/:id', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
 router.post('/', async (req, res) => {
   const { title, start_date, end_date, is_active } = req.body;
 
@@ -67,26 +66,34 @@ router.post('/', async (req, res) => {
 
   try {
     const activeState = is_active !== undefined ? is_active : 1;
-    const [result] = await db.query(
+
+    // 1. إضافة العرض الجديد
+    await db.query(
       "INSERT INTO promotions (title, start_date, end_date, is_active) VALUES (?, ?, ?, ?)",
       [title, start_date, end_date, activeState]
     );
 
-    // 🔹 1. جلب إيميلات المستخدمين المشتركين بالـ Newsletter
+    // 2. جلب إيميلات المشتركين وإرسال الإشعارات في الخلفية
     const [subscribers] = await db.query(
       "SELECT email FROM users WHERE (subscribe_to_newsletter = TRUE OR subscribe_to_newsletter = 1) AND email IS NOT NULL AND email != ''"
     );
 
     const emailList = subscribers.map((u) => u.email);
 
-    // 🔹 2. استدعاء دالة الإرسال التلقائي في الخلفية (عدم حظر الرد)
     if (emailList.length > 0) {
       sendPromotionNotification(emailList, title).catch((err) => {
         console.error('خطأ في إرسال إيميل العرض في الخلفية:', err);
       });
     }
 
-    res.status(201).json({ message: 'تمت إضافة العرض بنجاح وإشعار المشتركين', id: result.insertId });
+    // 3. جلب جميع العروضات مرتبة من الأحدث إلى الأقدم (DESC)
+    const [allPromotions] = await db.query(
+      "SELECT id, title, start_date, end_date, is_active, created_at FROM promotions ORDER BY id DESC"
+    );
+
+    // 4. إرجاع مصفوفة العروض مباشرة
+    res.status(201).json(allPromotions);
+
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
