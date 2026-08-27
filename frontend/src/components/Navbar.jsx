@@ -1,32 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { FaShoppingCart } from 'react-icons/fa';
-import { FiLogOut, FiLogIn } from 'react-icons/fi';
+import { FiLogOut, FiLogIn, FiMenu, FiX, FiUser } from 'react-icons/fi';
 import axios from 'axios';
 import ThemeToggle from './ThemeToggle.jsx';
 import '../styles/Navbar.css';
 
 const SERVER_ORIGIN = import.meta.env.VITE_BACKEND_URL;
+
 const Navbar = () => {
   const [cartCount, setCartCount] = useState(0);
-  const [user, setUser] = useState();
+  const [user, setUser] = useState(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navigate = useNavigate();
-  const id = localStorage.getItem('userId')
+  const location = useLocation();
+  const userId = localStorage.getItem('userId');
 
   const getName = async () => {
-    if(!id) return;
+    if (!userId) return;
     try {
-      const res = await axios.get(`${SERVER_ORIGIN}/api/users/${id}`);
-      setUser(res.data)
+      const res = await axios.get(`${SERVER_ORIGIN}/api/users/${userId}`);
+      setUser(res.data);
+    } catch (err) {
+      console.log(err.message);
     }
-    catch (err) {
-      console.log(err.message)
-    }
-  }
-useEffect(()=>{
-  getName()
-},[id])
+  };
+
+  useEffect(() => {
+    getName();
+  }, [userId]);
 
   const updateCartCount = () => {
     const savedCart = JSON.parse(localStorage.getItem('trilogy_cart') || '[]');
@@ -46,62 +49,164 @@ useEffect(()=>{
     };
   }, []);
 
-  const userId = localStorage.getItem('userId');
+  // Close mobile menu automatically on route change
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location.pathname]);
+
+  // Close mobile menu on Escape key press
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setIsMobileMenuOpen(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen((prev) => !prev);
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('userId');
+    localStorage.removeItem('userRole');
+    setIsMobileMenuOpen(false);
+    navigate('/');
+    window.location.reload();
+  };
 
   return (
-    <nav className="navbar">
+    <nav className={`navbar ${isMobileMenuOpen ? 'menu-expanded' : ''}`}>
       <div className="navbar-container">
-        {user?.name && (
-          <p className="user-welcome">مرحباً {user.name.split(" ")[0]}</p>
-        )}
-        <Link to="/" className="logo">
-          Trilogy
-        </Link>
-
-
-        <div className="nav-links">
-          <Link to="/products" className="nav-item">المنتجات</Link>
-          <Link to="/promotions" className="nav-item">العروضات</Link>
-          {userId && (
-            <Link to="/order-history" className="nav-item">مشترياتي</Link>
+        {/* Brand & Desktop User Welcome */}
+        <div className="navbar-brand">
+          <Link to="/" className="logo" onClick={closeMobileMenu}>
+            Trilogy
+          </Link>
+          {user?.name && (
+            <div className="user-welcome desktop-welcome">
+              <FiUser className="user-icon" />
+              <span>مرحباً {user.name.split(' ')[0]}</span>
+            </div>
           )}
         </div>
 
-        {/* أدوات الإجراءات */}
+        {/* Links Section (Desktop & Mobile Drawer) */}
+        <div className={`nav-links ${isMobileMenuOpen ? 'is-open' : ''}`}>
+          {user?.name && (
+            <div className="user-welcome mobile-welcome">
+              <FiUser className="user-icon" />
+              <span>مرحباً {user.name.split(' ')[0]}</span>
+            </div>
+          )}
+          <NavLink
+            to="/products"
+            className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')}
+            onClick={closeMobileMenu}
+          >
+            المنتجات
+          </NavLink>
+          <NavLink
+            to="/promotions"
+            className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')}
+            onClick={closeMobileMenu}
+          >
+            العروضات
+          </NavLink>
+          {userId && (
+            <NavLink
+              to="/order-history"
+              className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')}
+              onClick={closeMobileMenu}
+            >
+              مشترياتي
+            </NavLink>
+          )}
+
+          {/* Mobile Auth Button Inside Drawer */}
+          <div className="mobile-auth-container">
+            {userId ? (
+              <button
+                className="nav-btn btn-logout mobile-btn"
+                title="تسجيل الخروج"
+                onClick={handleLogout}
+              >
+                <FiLogOut className="btn-icon" />
+                <span>تسجيل الخروج</span>
+              </button>
+            ) : (
+              <button
+                className="nav-btn btn-login mobile-btn"
+                title="تسجيل الدخول"
+                onClick={() => {
+                  closeMobileMenu();
+                  navigate('/login');
+                }}
+              >
+                <FiLogIn className="btn-icon" />
+                <span>تسجيل الدخول</span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Action Tools (Theme, Cart, Auth & Hamburger Toggle) */}
         <div className="nav-actions">
           <ThemeToggle />
 
-          <Link to="/cart" className="cart-icon-wrapper" aria-label="سلة التسوق">
+          <Link
+            to="/cart"
+            className="cart-icon-wrapper"
+            aria-label="سلة التسوق"
+            onClick={closeMobileMenu}
+          >
             <FaShoppingCart className="cart-icon" />
             {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
           </Link>
 
-          {userId ? (
-            <button
-              className="nav-btn btn-logout"
-              title="تسجيل الخروج"
-              onClick={() => {
-                localStorage.removeItem('userId');
-                localStorage.removeItem('userRole');
-                window.location.reload();
-                navigate('/')
-              }}
-            >
-              <FiLogOut className="btn-icon" />
-              <span className="btn-text">تسجيل الخروج</span>
-            </button>
-          ) : (
-            <button
-              className="nav-btn btn-login"
-              title="تسجيل الدخول"
-              onClick={() => navigate('/login')}
-            >
-              <FiLogIn className="btn-icon" />
-              <span className="btn-text">تسجيل الدخول</span>
-            </button>
-          )}  
+          {/* Desktop Auth Button */}
+          <div className="desktop-auth-container">
+            {userId ? (
+              <button
+                className="nav-btn btn-logout"
+                title="تسجيل الخروج"
+                onClick={handleLogout}
+              >
+                <FiLogOut className="btn-icon" />
+                <span className="btn-text">تسجيل الخروج</span>
+              </button>
+            ) : (
+              <button
+                className="nav-btn btn-login"
+                title="تسجيل الدخول"
+                onClick={() => navigate('/login')}
+              >
+                <FiLogIn className="btn-icon" />
+                <span className="btn-text">تسجيل الدخول</span>
+              </button>
+            )}
+          </div>
+
+          {/* Hamburger Menu Toggle Button */}
+          <button
+            className="mobile-menu-toggle"
+            onClick={toggleMobileMenu}
+            aria-label={isMobileMenuOpen ? 'إغلاق القائمة' : 'فتح القائمة'}
+            aria-expanded={isMobileMenuOpen}
+          >
+            {isMobileMenuOpen ? <FiX /> : <FiMenu />}
+          </button>
         </div>
       </div>
+
+      {/* Backdrop for closing mobile menu on outside click */}
+      {isMobileMenuOpen && (
+        <div className="mobile-backdrop" onClick={closeMobileMenu} aria-hidden="true" />
+      )}
     </nav>
   );
 };
