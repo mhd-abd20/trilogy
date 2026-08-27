@@ -69,7 +69,7 @@ const PromotionsCategories = () => {
     try {
       await createPromotion(formData);
       setFormData({ title: '', start_date: '', end_date: '', is_active: 1 });
-      fetchPromotions();
+      await fetchPromotions();
     } catch (err) {
       alert('خطأ أثناء إضافة العرض: ' + err.message);
     } finally {
@@ -129,7 +129,7 @@ const PromotionsCategories = () => {
           
           <div className="form-grid">
             <div className="form-group">
-              <label>عنوان العرض</label>
+              <label style={{color:"white"}}>عنوان العرض</label>
               <input
                 type="text"
                 name="title"
@@ -141,7 +141,7 @@ const PromotionsCategories = () => {
             </div>
 
             <div className="form-group">
-              <label>تاريخ البداية (الحد أدنى: اليوم)</label>
+              <label style={{color:"white"}}>تاريخ البداية (الحد أدنى: اليوم)</label>
               <input
                 type="datetime-local"
                 name="start_date"
@@ -153,7 +153,7 @@ const PromotionsCategories = () => {
             </div>
 
             <div className="form-group">
-              <label>تاريخ النهاية (أكبر من البداية)</label>
+              <label style={{color:"white"}}>تاريخ النهاية (أكبر من البداية)</label>
               <input
                 type="datetime-local"
                 name="end_date"
@@ -165,7 +165,7 @@ const PromotionsCategories = () => {
             </div>
 
             <div className="form-group checkbox-group">
-              <label className="checkbox-label">
+              <label className="checkbox-label" style={{color:"white"}}>
                 <input
                   type="checkbox"
                   name="is_active"
@@ -194,7 +194,7 @@ const PromotionsCategories = () => {
                 <div key={p.id} className={`promo-card ${expired ? 'expired-card' : ''}`}>
                   
                   <div className="card-header">
-                    <h4>{p.title}</h4>
+                    <h4 style={{color:'black'}}>{p.title}</h4>
                     <span className={`status-badge ${expired ? 'badge-expired' : (isActive ? 'badge-active' : 'badge-disabled')}`}>
                       {expired ? 'منتهي' : (isActive ? 'نشط' : 'معطّل')}
                     </span>
@@ -205,7 +205,7 @@ const PromotionsCategories = () => {
                     <p><strong>إلى:</strong> {p.end_date ? p.end_date.split('T')[0] : 'غير حدد'}</p>
                   </div>
 
-                  {/* ⚡ مفتاح الـ Toggle + زر التفاصيل + زر الحذف */}
+                 
                   <div className="card-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
                     <label className="toggle-switch">
                       <input

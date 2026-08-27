@@ -79,9 +79,11 @@ router.post('/', async (req, res) => {
 
     const emailList = subscribers.map((u) => u.email);
 
-    // 🔹 2. استدعاء دالة الإرسال التلقائي
+    // 🔹 2. استدعاء دالة الإرسال التلقائي في الخلفية (عدم حظر الرد)
     if (emailList.length > 0) {
-      await sendPromotionNotification(emailList, title);
+      sendPromotionNotification(emailList, title).catch((err) => {
+        console.error('خطأ في إرسال إيميل العرض في الخلفية:', err);
+      });
     }
 
     res.status(201).json({ message: 'تمت إضافة العرض بنجاح وإشعار المشتركين', id: result.insertId });

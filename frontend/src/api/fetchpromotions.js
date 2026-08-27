@@ -25,16 +25,9 @@ export const togglePromotionActive = async (id, isActive) => {
   });
 };
 export const deletePromotion = async (id) => {
-  const response = await fetch(`${SERVER_ORIGIN}/api/promotions/${id}`, {
+ return await customFetch(`/promotions/${id}`, {
     method: 'DELETE',
   });
-  
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error || 'فشل حذف العرض');
-  }
-
-  return await response.json();
 };
 export const addProductToPromotion = async (promotionId, productId, discountPercentage) => {
  
