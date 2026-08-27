@@ -31,8 +31,8 @@ const sendPromotionNotification = async (userEmails, promoTitle) => {
   };
 
   try {
-    await transporter.sendMail(mailOptions);
-    console.log('تم إرسال إشعارات العرض الجديد للمشتركين بنجاح.');
+    const info = await transporter.sendMail(mailOptions);
+   console.log('✅ تم إرسال البريد بنجاح! Message ID:', info.messageId);
   } catch (error) {
     console.error('خطأ في إرسال إيميل العرض:', error);
   }
