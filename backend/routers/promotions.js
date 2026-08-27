@@ -122,7 +122,7 @@ router.post('/:id/products', async (req, res) => {
     const { id } = req.params; 
     const { product_id, discount_percentage } = req.body;
 
-   
+   //product
     const [[product]] = await db.query('SELECT price FROM products WHERE id = ?', [product_id]);
 
     if (!product) {
