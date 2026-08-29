@@ -166,7 +166,7 @@ const Products = () => {
 
                   <h3>{product.name || product.product_name}</h3>
 
-                  <p>الكمية: {product.stock_quantity}</p>
+                  <p className='kamiya'>الكمية: {product.stock_quantity}</p>
                   <div className="product-price-wrapper" style={{ margin: '10px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                     {hasDiscount ? (
                       <>

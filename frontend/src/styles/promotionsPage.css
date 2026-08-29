@@ -19,12 +19,10 @@
   font-weight: 700;
 }
 
-/* التنسيق للوضع الداكن (Dark Mode) */
-@media (prefers-color-scheme: dark) {
-  .promotions-container h2,
-  .promo-details-container h2 {
-    color: #ffffff !important; 
-  }
+
+[data-theme="dark"] .promotions-container h2,
+[data-theme="dark"] .promo-details-container h2 {
+  color: #ffffff !important;
 }
 
 /* حالة التحميل والتنبيهات */

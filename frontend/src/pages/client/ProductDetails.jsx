@@ -81,7 +81,7 @@ const SERVER_ORIGIN = import.meta.env.VITE_BACKEND_URL;
 
     localStorage.setItem('trilogy_cart', JSON.stringify(savedCart));
     window.dispatchEvent(new Event('cartUpdated'));
-    alert('تمت إضافة المنتج إلى السلة بنجاح! 🛒');
+    
   };
 
   if (loading) return <div className="details-loading">جاري تحميل تفاصيل المنتج...</div>;

@@ -1,27 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-export default function ImageGeneratorInput({ onImageSelected, defaultImage = '' }) {
+export default function ImageGeneratorInput({ onImageSelected, defaultImage = '', disabled = false }) {
   const [prompt, setPrompt] = useState('');
   const [imageUrl, setImageUrl] = useState(defaultImage);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-const SERVER_ORIGIN = import.meta.env.VITE_BACKEND_URL;
+  const SERVER_ORIGIN = import.meta.env.VITE_BACKEND_URL;
+
+  
+  useEffect(() => {
+    setImageUrl(defaultImage);
+  }, [defaultImage]);
+
   const handleGenerate = async (e) => {
     e.preventDefault();
-    if (!prompt.trim()) return;
+    if (!prompt.trim() || disabled) return;
 
     setLoading(true);
     setError(null);
 
     try {
-      // طلب رابط الصورة من مسار ה-Backend الخاص بك
       const response = await axios.post(`${SERVER_ORIGIN}/api/products/generate-image`, { prompt });
       const generatedUrl = response.data.imageUrl;
 
       setImageUrl(generatedUrl);
 
-      // تمرير رابط الصورة الناتجة للـ Form الرئيسي (Component الأب)
       if (onImageSelected) {
         onImageSelected(generatedUrl);
       }
@@ -33,26 +37,32 @@ const SERVER_ORIGIN = import.meta.env.VITE_BACKEND_URL;
     }
   };
 
+  const handleClearImage = () => {
+    setImageUrl('');
+    if (onImageSelected) onImageSelected('');
+  };
+
   return (
     <div style={{
       border: '1px solid #e2e8f0',
       borderRadius: '8px',
       padding: '16px',
-      backgroundColor: '#f8fafc',
+      backgroundColor: disabled ? '#f1f5f9' : '#f8fafc', 
+      opacity: disabled ? 0.6 : 1,
+      pointerEvents: disabled ? 'none' : 'auto', 
       marginBottom: '20px'
     }}>
       <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '8px', color: '#1e293b' }}>
-        توليد صورة المنتج بالذكاء الاصطناعي
+        توليد صورة المنتج بالذكاء الاصطناعي {disabled && '(معطل لأنك رفعت صورة من الجهاز)'}
       </label>
 
-      {/* حقل الوصف وزر التوليد */}
       <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
         <input
           type="text"
-          placeholder="اكتب وصف الصورة بالإنكليزية (مثال: Wireless gaming mouse, black matte finish)"
+          placeholder="اكتب وصف الصورة بالإنكليزية..."
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
-          disabled={loading}
+          disabled={loading || disabled} 
           style={{
             flex: 1,
             padding: '10px 12px',
@@ -66,16 +76,15 @@ const SERVER_ORIGIN = import.meta.env.VITE_BACKEND_URL;
         <button
           type="button"
           onClick={handleGenerate}
-          disabled={loading || !prompt.trim()}
+          disabled={loading || !prompt.trim() || disabled} 
           style={{
             padding: '10px 18px',
-            backgroundColor: loading ? '#94a3b8' : '#0284c7',
+            backgroundColor: (loading || disabled) ? '#94a3b8' : '#0284c7',
             color: '#ffffff',
             border: 'none',
             borderRadius: '6px',
             fontWeight: 'bold',
-            cursor: loading ? 'not-allowed' : 'pointer',
-            transition: 'background-color 0.2s'
+            cursor: (loading || disabled) ? 'not-allowed' : 'pointer'
           }}
         >
           {loading ? 'جاري التوليد...' : 'توليد الصورة'}
@@ -88,7 +97,6 @@ const SERVER_ORIGIN = import.meta.env.VITE_BACKEND_URL;
         </p>
       )}
 
-      {/* معاينة الصورة الناتجة */}
       {imageUrl && (
         <div style={{ marginTop: '12px', textAlign: 'center' }}>
           <p style={{ fontSize: '12px', color: '#64748b', marginBottom: '6px' }}>معاينة الصورة الناتجة:</p>
@@ -103,6 +111,14 @@ const SERVER_ORIGIN = import.meta.env.VITE_BACKEND_URL;
               objectFit: 'cover'
             }}
           />
+          <br />
+          <button
+            type="button"
+            onClick={handleClearImage}
+            style={{ fontSize: '12px', color: '#ef4444', marginTop: '6px', cursor: 'pointer', background: 'none', border: 'none' }}
+          >
+            مسح الصورة المولدة ❌
+          </button>
         </div>
       )}
     </div>
