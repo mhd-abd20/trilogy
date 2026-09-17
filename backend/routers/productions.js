@@ -5,6 +5,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const Redis = require('ioredis');
+const axios = require('axios');
 
 const redis = new Redis(process.env.REDIS_URL);
 
