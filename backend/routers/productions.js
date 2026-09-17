@@ -225,7 +225,7 @@ router.delete('/:id', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-const axios = require('axios');
+
 
 router.post('/search-image', async (req, res) => {
   try {
