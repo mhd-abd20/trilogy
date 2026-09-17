@@ -57,6 +57,25 @@ const Products = () => {
     return `${SERVER_ORIGIN}${cleanPath}`;
   };
 
+  const stockStatus = (stock)=>{
+if(stock>10){
+  return(
+    <p style={{color: "green"}}>الكمية: {stock} (متوفرة)</p>
+  )
+}
+  else if(stock<10 && stock>0){
+      return(
+    <p style={{color: "#FFD700"}}>الكمية: {stock} (كمية محدودة)</p>
+  )
+  }
+  else{
+       return(
+    <p style={{color: "red"}}>الكمية: {stock} (غير متوفرة)</p>
+  )
+  }
+}
+  
+
   const addToCart = (product) => {
     const prodId = product.id || product.product_id;
     const effectivePrice = product.promo_price !== null && product.promo_price !== undefined
@@ -166,7 +185,7 @@ const Products = () => {
 
                   <h3>{product.name || product.product_name}</h3>
 
-                  <p className='kamiya'>الكمية: {product.stock_quantity}</p>
+                 {stockStatus(product.stock_quantity)}
                   <div className="product-price-wrapper" style={{ margin: '10px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                     {hasDiscount ? (
                       <>

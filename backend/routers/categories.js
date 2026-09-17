@@ -25,25 +25,43 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
   const { name, is_active } = req.body;
 
-  if (!name) {
-    return res.status(400).json({ error: 'اسم الفئة مطلوب' });
+
+  const cleanName = typeof name === 'string' ? name.trim() : '';
+
+  if (!cleanName) {
+    return res.status(400).json({ error: 'اسم الفئة مطلوب ولا يمكن أن يكون مسافات فارغة فقط' });
   }
 
   try {
- const [result] = await db.query(
-  'INSERT INTO categories (name, is_active) VALUES (?, ?)',
-  [name, true]
-);
+    
+    const [existingCategory] = await db.query(
+      'SELECT id FROM categories WHERE LOWER(TRIM(name)) = LOWER(?)',
+      [cleanName]
+    );
+
+    if (existingCategory.length > 0) {
+      return res.status(409).json({ error: 'هذه الفئة موجودة بالفعل' }); 
+    }
+
+    const activeState = is_active !== undefined ? is_active : true;
+
+    const [result] = await db.query(
+      'INSERT INTO categories (name, is_active) VALUES (?, ?)',
+      [cleanName, activeState]
+    );
 
     res.status(201).json({
       message: 'تم إضافة الفئة بنجاح',
       categoryId: result.insertId
     });
   } catch (err) {
+ 
+    if (err.code === 'ER_DUP_ENTRY') {
+      return res.status(409).json({ error: 'هذه الفئة مسجلة مسبقاً' });
+    }
     res.status(500).json({ error: err.message });
   }
 });
-
 
 router.put('/:id', async (req, res) => {
   const { id } = req.params;
