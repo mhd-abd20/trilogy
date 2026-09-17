@@ -236,7 +236,7 @@ router.post('/search-image', async (req, res) => {
 
     const cleanQuery = query.trim();
 
-    // 1. ترجمة الاسم إلى الإنجليزية في حال كانت الدالة متوفرة لديك
+    
     let englishQuery = cleanQuery;
     if (typeof translateToEnglish === 'function') {
       try {
@@ -246,12 +246,11 @@ router.post('/search-image', async (req, res) => {
       }
     }
 
-    // 2. إرسال الطلب لـ Unsplash API
     const response = await axios.get('https://api.unsplash.com/search/photos', {
       params: {
         query: englishQuery,
         per_page: 1,
-        orientation: 'squarish' // صورة مربعة تناسب كروت المنتجات
+        orientation: 'squarish' 
       },
       headers: {
         Authorization: `Client-ID ${process.env.UNSPLASH_ACCESS_KEY}`
@@ -264,7 +263,6 @@ router.post('/search-image', async (req, res) => {
       return res.status(404).json({ message: 'لم يتم العثور على أي صورة لهذا المنتج' });
     }
 
-    // 3. استخراج رابط الصورة المباشر
     const imageUrl = results[0].urls.regular;
 
     res.json({ 
