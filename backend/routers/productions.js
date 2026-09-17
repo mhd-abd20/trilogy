@@ -18,10 +18,10 @@ async function translateToEnglish(text) {
     if (data && data.responseData && data.responseData.translatedText) {
       return data.responseData.translatedText;
     }
-    return text; // في حال تعذر الترجمة، يتم إرجاع النص الأصلي
+    return text; 
   } catch (error) {
     console.error('Translation error:', error.message);
-    return text; // استمرار العمل بالنص الأصلي لعدم إيقاف السيرفر
+    return text; 
   }
 }
 
@@ -225,34 +225,56 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-router.post('/generate-image', async (req, res) => {
+router.post('/search-image', async (req, res) => {
   try {
-    const { prompt } = req.body;
+    const { query } = req.body;
 
-    if (!prompt || !prompt.trim()) {
-      return res.status(400).json({ message: 'يرجى إدخال وصف للصورة' });
+    if (!query || !query.trim()) {
+      return res.status(400).json({ message: 'يرجى إدخال اسم المنتج أو وصف للبحث' });
     }
 
-    const cleanPrompt = prompt.trim();
-    console.log('الوصف الأصلي:', cleanPrompt);
+    const cleanQuery = query.trim();
 
-    // 1. ترجمة الوصف إلى الإنجليزية
-    const englishPrompt = await translateToEnglish(cleanPrompt);
-    console.log('الوصف المترجم:', englishPrompt);
+    // 1. ترجمة الاسم إلى الإنجليزية في حال كانت الدالة متوفرة لديك
+    let englishQuery = cleanQuery;
+    if (typeof translateToEnglish === 'function') {
+      try {
+        englishQuery = await translateToEnglish(cleanQuery);
+      } catch (err) {
+        console.warn('فشلت الترجمة، سيتم البحث بالاسم المدخل مباشرة:', err.message);
+      }
+    }
 
-    // 2. تحويل الوصف لرابط آمن (URL Safe)
-    const encodedPrompt = encodeURIComponent(englishPrompt);
-    const randomSeed = Math.floor(Math.random() * 1000000);
+    // 2. إرسال الطلب لـ Unsplash API
+    const response = await axios.get('https://api.unsplash.com/search/photos', {
+      params: {
+        query: englishQuery,
+        per_page: 1,
+        orientation: 'squarish' // صورة مربعة تناسب كروت المنتجات
+      },
+      headers: {
+        Authorization: `Client-ID ${process.env.UNSPLASH_ACCESS_KEY}`
+      }
+    });
 
-    // 3. بناء رابط Pollinations AI مع نموذج flux المتميز
-    const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=800&height=800&seed=${randomSeed}&model=flux&nologo=true`;
+    const results = response.data.results;
 
-    res.json({ imageUrl, translatedPrompt: englishPrompt });
+    if (!results || results.length === 0) {
+      return res.status(404).json({ message: 'لم يتم العثور على أي صورة لهذا المنتج' });
+    }
+
+    // 3. استخراج رابط الصورة المباشر
+    const imageUrl = results[0].urls.regular;
+
+    res.json({ 
+      imageUrl, 
+      searchedQuery: englishQuery 
+    });
 
   } catch (error) {
-    console.error('Image Generation Error:', error);
+    console.error('Image Search Error:', error.response?.data || error.message);
     res.status(500).json({ 
-      message: 'حدث خطأ أثناء توليد الصورة', 
+      message: 'حدث خطأ أثناء جلب الصورة من Unsplash', 
       error: error.message 
     });
   }

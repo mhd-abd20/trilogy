@@ -90,7 +90,7 @@ const CartPage = () => {
           quantity: item.quantity,
           unitPrice: item.price,
         })),
-        totalAmount: totalPrice,
+        totalAmount: totalPrice.toFixed(2),
       };
 
       await axios.post(`${SERVER_ORIGIN}/api/orders/checkout`, payload);
@@ -153,7 +153,7 @@ const CartPage = () => {
                   </div>
 
                   <div className="item-total">
-                    ${item.price * item.quantity}
+                    ${(item.price * item.quantity).toFixed(2)}
                   </div>
 
                   <button onClick={() => removeItem(itemId)} className="btn-remove">
@@ -168,7 +168,7 @@ const CartPage = () => {
             <h3>ملخص الطلب</h3>
             <div className="summary-row">
               <span>المجموع الكلي:</span>
-              <strong>${totalPrice}</strong>
+              <strong>${totalPrice.toFixed(2)}</strong>
             </div>
             {localStorage.getItem('userId') ? (
               <button

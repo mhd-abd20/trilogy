@@ -93,7 +93,7 @@ const OrdersPage = () => {
                     </span>
                   </td>
                   <td>${Number(order.total_amount).toFixed(2)}</td>
-                  <td>{new Date(order.created_at).toLocaleDateString('ar-EG')}</td>
+                  <td>{new Date(order.created_at).toLocaleDateString()}</td>
                   <td>
                     <span className={`status-tag ${order.status}`}>
                       {order.status}
