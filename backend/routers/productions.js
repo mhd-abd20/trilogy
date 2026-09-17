@@ -225,56 +225,57 @@ router.delete('/:id', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+const axios = require('axios');
 
 router.post('/search-image', async (req, res) => {
   try {
     const { query } = req.body;
 
     if (!query || !query.trim()) {
-      return res.status(400).json({ message: 'يرجى إدخال اسم المنتج أو وصف للبحث' });
+      return res.status(400).json({ message: 'يرجى إدخال اسم المنتج للبحث' });
+    }
+
+    const apiKey = process.env.SERPER_API_KEY;
+    if (!apiKey) {
+      console.error('❌ خطأ: SERPER_API_KEY غير معرّف في متغيرات البيئة.');
+      return res.status(500).json({ message: 'مفتاح Serper API غير معرّف في السيرفر' });
     }
 
     const cleanQuery = query.trim();
 
-    
-    let englishQuery = cleanQuery;
-    if (typeof translateToEnglish === 'function') {
-      try {
-        englishQuery = await translateToEnglish(cleanQuery);
-      } catch (err) {
-        console.warn('فشلت الترجمة، سيتم البحث بالاسم المدخل مباشرة:', err.message);
-      }
-    }
-
-    const response = await axios.get('https://api.unsplash.com/search/photos', {
-      params: {
-        query: englishQuery,
-        per_page: 1,
-        orientation: 'squarish' 
+  
+    const response = await axios.post(
+      'https://google.serper.dev/images',
+      {
+        q: cleanQuery,
+        num: 1 
       },
-      headers: {
-        Authorization: `Client-ID ${process.env.UNSPLASH_ACCESS_KEY}`
+      {
+        headers: {
+          'X-API-KEY': apiKey,
+          'Content-Type': 'application/json'
+        }
       }
-    });
+    );
 
-    const results = response.data.results;
+    const images = response.data?.images;
 
-    if (!results || results.length === 0) {
-      return res.status(404).json({ message: 'لم يتم العثور على أي صورة لهذا المنتج' });
+    if (!images || images.length === 0) {
+      return res.status(404).json({ message: 'لم يتم العثور على أي صورة تطابق هذا البحث' });
     }
 
-    const imageUrl = results[0].urls.regular;
+    // رابط الصورة المباشر من نتائج Google
+    const imageUrl = images[0].imageUrl;
 
-    res.json({ 
-      imageUrl, 
-      searchedQuery: englishQuery 
-    });
+    return res.json({ imageUrl });
 
   } catch (error) {
-    console.error('Image Search Error:', error.response?.data || error.message);
-    res.status(500).json({ 
-      message: 'حدث خطأ أثناء جلب الصورة من Unsplash', 
-      error: error.message 
+    const errorDetails = error.response?.data || error.message;
+    console.error('Serper Image Search Error:', errorDetails);
+
+    return res.status(500).json({ 
+      message: 'حدث خطأ أثناء جلب الصورة من Serper', 
+      error: typeof errorDetails === 'object' ? JSON.stringify(errorDetails) : errorDetails 
     });
   }
 });

@@ -32,7 +32,7 @@ export default function ImageGeneratorInput({ onImageSelected, defaultImage = ''
       }
     } catch (err) {
       console.error('Error fetching image:', err);
-      const serverMessage = err.response?.data?.message || 'تعذر العثور على صورة، يرجى تجربة كلمات بحث أخرى.';
+      const serverMessage = err.response?.data?.message || 'تعذر العثور على صورة، يرجى تجربة اسم آخر.';
       setError(serverMessage);
     } finally {
       setLoading(false);
@@ -55,13 +55,13 @@ export default function ImageGeneratorInput({ onImageSelected, defaultImage = ''
       marginBottom: '20px'
     }}>
       <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '8px', color: '#1e293b' }}>
-        البحث عن صورة للمنتج من الإنترنت {disabled && '(معطل لأنك رفعت صورة من الجهاز)'}
+        البحث عن صورة من Google {disabled && '(معطل لأنك اخترت رفع ملف)'}
       </label>
 
       <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
         <input
           type="text"
-          placeholder="اكتب اسم المنتج (مثال: Smart Watch أو سماعات بلوتوث)..."
+          placeholder="اكتب اسم المنتج بدقة (مثال: iPhone 15 Pro Max أو Nike Air Force)..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           disabled={loading || disabled} 
@@ -101,7 +101,7 @@ export default function ImageGeneratorInput({ onImageSelected, defaultImage = ''
 
       {imageUrl && (
         <div style={{ marginTop: '12px', textAlign: 'center' }}>
-          <p style={{ fontSize: '12px', color: '#64748b', marginBottom: '6px' }}>معاينة الصورة المختارة:</p>
+          <p style={{ fontSize: '12px', color: '#64748b', marginBottom: '6px' }}>الصورة المسترجعة من Google:</p>
           <img
             src={imageUrl}
             alt="Product Preview"
@@ -126,7 +126,7 @@ export default function ImageGeneratorInput({ onImageSelected, defaultImage = ''
               border: 'none' 
             }}
           >
-            مسح الصورة المختارة ❌
+            مسح الصورة ❌
           </button>
         </div>
       )}
