@@ -124,7 +124,7 @@ const OrdersPage = () => {
               </tr>
             ) : (
               filteredOrders.map((order) => {
-                const isPending = order.status === 'pending';
+                const isPending = order.status === 'Pending';
                 const isCurrentProcessing = processingId === order.order_id;
 
                 return (
