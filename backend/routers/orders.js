@@ -366,7 +366,7 @@ router.put('/decline/:id', async (req, res) => {
    
     for (const item of items) {
       await connection.query(
-        'UPDATE products SET stock = stock + ? WHERE id = ?',
+        'UPDATE products SET stock_quantity = stock_quantity + ? WHERE id = ?',
         [item.quantity, item.product_id]
       );
     }

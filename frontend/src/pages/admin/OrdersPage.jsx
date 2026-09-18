@@ -142,10 +142,10 @@ const OrdersPage = () => {
                     <td>{new Date(order.created_at).toLocaleDateString()}</td>
                     <td>
                       <span className={`status-tag status-${order.status}`}>
-                        {order.status === 'pending' && 'قيد الانتظار'}
+                        {order.status === 'Pending' && 'قيد الانتظار'}
                         {order.status === 'accepted' && 'مقبول'}
                         {order.status === 'declined' && 'مرفوض'}
-                        {!['pending', 'accepted', 'declined'].includes(order.status) && order.status}
+                        {!['Pending', 'accepted', 'declined'].includes(order.status) && order.status}
                       </span>
                     </td>
                     <td>
