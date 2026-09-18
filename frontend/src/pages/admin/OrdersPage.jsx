@@ -9,6 +9,7 @@ const OrdersPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [filterType, setFilterType] = useState('ALL'); 
+  const [processingId, setProcessingId] = useState(null);
 
   useEffect(() => {
     fetchOrders();
@@ -23,6 +24,46 @@ const OrdersPage = () => {
       setError(err.response?.data?.message || 'حدث خطأ أثناء تحميل البيانات');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAcceptOrder = async (orderId) => {
+    if (!window.confirm(`هل أنت متأكد من قبول الطلب رقم #${orderId}؟`)) return;
+
+    try {
+      setProcessingId(orderId);
+      await axios.put(`${API_URL}/api/orders/accept/${orderId}`);
+
+      // تحديث الحالة محلياً في الواجهة
+      setOrders((prev) =>
+        prev.map((order) =>
+          order.order_id === orderId ? { ...order, status: 'accepted' } : order
+        )
+      );
+    } catch (err) {
+      alert(err.response?.data?.message || err.response?.data?.error || 'فشل قبول الطلب');
+    } finally {
+      setProcessingId(null);
+    }
+  };
+
+  const handleDeclineOrder = async (orderId) => {
+    if (!window.confirm(`هل أنت متأكد من رفض الطلب رقم #${orderId} وإرجاع المنتجات للمخزون؟`)) return;
+
+    try {
+      setProcessingId(orderId);
+      await axios.put(`${API_URL}/api/orders/decline/${orderId}`);
+
+      // تحديث الحالة محلياً في الواجهة
+      setOrders((prev) =>
+        prev.map((order) =>
+          order.order_id === orderId ? { ...order, status: 'declined' } : order
+        )
+      );
+    } catch (err) {
+      alert(err.response?.data?.message || err.response?.data?.error || 'فشل رفض الطلب');
+    } finally {
+      setProcessingId(null);
     }
   };
 
@@ -73,34 +114,80 @@ const OrdersPage = () => {
               <th>المبلغ الكلي</th>
               <th>تاريخ الطلب</th>
               <th>الحالة</th>
+              <th>الإجراءات</th>
             </tr>
           </thead>
           <tbody>
             {filteredOrders.length === 0 ? (
               <tr>
-                <td colSpan="8" style={{ textAlign: 'center' }}>لا توجد عمليات شراء معروضة</td>
+                <td colSpan="9" style={{ textAlign: 'center' }}>لا توجد عمليات شراء معروضة</td>
               </tr>
             ) : (
-              filteredOrders.map((order) => (
-                <tr key={order.order_id}>
-                  <td>#{order.order_id}</td>
-                  <td><strong>{order.customer_name || 'غير معروف'}</strong></td>
-                  <td>{order.customer_email}</td>
-                  <td>{order.customer_phone}</td>
-                  <td>
-                    <span className={`badge badge-${order.user_type.toLowerCase()}`}>
-                      {order.user_type === 'Client' ? 'عميل مسجل' : 'زائر'}
-                    </span>
-                  </td>
-                  <td>${Number(order.total_amount).toFixed(2)}</td>
-                  <td>{new Date(order.created_at).toLocaleDateString()}</td>
-                  <td>
-                    <span className={`status-tag ${order.status}`}>
-                      {order.status}
-                    </span>
-                  </td>
-                </tr>
-              ))
+              filteredOrders.map((order) => {
+                const isPending = order.status === 'pending';
+                const isCurrentProcessing = processingId === order.order_id;
+
+                return (
+                  <tr key={order.order_id}>
+                    <td>#{order.order_id}</td>
+                    <td><strong>{order.customer_name || 'غير معروف'}</strong></td>
+                    <td>{order.customer_email}</td>
+                    <td>{order.customer_phone}</td>
+                    <td>
+                      <span className={`badge badge-${order.user_type.toLowerCase()}`}>
+                        {order.user_type === 'Client' ? 'عميل مسجل' : 'زائر'}
+                      </span>
+                    </td>
+                    <td>${Number(order.total_amount).toFixed(2)}</td>
+                    <td>{new Date(order.created_at).toLocaleDateString()}</td>
+                    <td>
+                      <span className={`status-tag status-${order.status}`}>
+                        {order.status === 'pending' && 'قيد الانتظار'}
+                        {order.status === 'accepted' && 'مقبول'}
+                        {order.status === 'declined' && 'مرفوض'}
+                        {!['pending', 'accepted', 'declined'].includes(order.status) && order.status}
+                      </span>
+                    </td>
+                    <td>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <button
+                          type="button"
+                          disabled={!isPending || isCurrentProcessing}
+                          onClick={() => handleAcceptOrder(order.order_id)}
+                          style={{
+                            padding: '6px 12px',
+                            backgroundColor: isPending ? '#16a34a' : '#cbd5e1',
+                            color: '#ffffff',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: isPending && !isCurrentProcessing ? 'pointer' : 'not-allowed',
+                            fontSize: '13px'
+                          }}
+                        >
+                          {isCurrentProcessing ? '...' : 'قبول'}
+                        </button>
+
+                        <button
+                          type="button"
+                          disabled={!isPending || isCurrentProcessing}
+                          onClick={() => handleDeclineOrder(order.order_id)}
+                          style={{
+                            padding: '6px 12px',
+                            backgroundColor: isPending ? '#dc2626' : '#cbd5e1',
+                            color: '#ffffff',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: isPending && !isCurrentProcessing ? 'pointer' : 'not-allowed',
+                            fontSize: '13px'
+                          }}
+                        >
+                          {isCurrentProcessing ? '...' : 'رفض'}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>

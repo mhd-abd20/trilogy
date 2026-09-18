@@ -11,7 +11,7 @@ const db = mysql.createPool({
 
   ssl: {
     minVersion: 'TLSv1.2',
-    rejectUnauthorized: true
+    rejectUnauthorized: false
   },
 
   waitForConnections: true,

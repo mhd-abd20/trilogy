@@ -316,4 +316,76 @@ router.get('/all-orders', async (req, res) => {
 });
 
 
+router.put("/accept/:id" , async(req,res)=>{
+  try{
+    const {id} = req.params;
+    const query = "UPDATE orders SET status ='accepted' WHERE id =?"
+    const [result] = await db.query(query,[id])
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "الطلب غير موجود" });
+    }
+
+    res.status(200).json("order accepted")
+  }
+  catch(err){
+    res.status(500).json({error: err.message})
+  }
+})
+
+
+router.put('/decline/:id', async (req, res) => {
+  const { id } = req.params;
+  const connection = await db.getConnection(); 
+
+  try {
+    await connection.beginTransaction();
+
+   
+    const [orderRows] = await connection.query(
+      'SELECT status FROM orders WHERE id = ? FOR UPDATE',
+      [id]
+    );
+
+    if (orderRows.length === 0) {
+      await connection.rollback();
+      return res.status(404).json({ message: 'الطلب غير موجود' });
+    }
+
+    if (orderRows[0].status === 'declined') {
+      await connection.rollback();
+      return res.status(400).json({ message: 'الطلب مرفوض مسبقاً' });
+    }
+
+  
+    const [items] = await connection.query(
+      'SELECT product_id, quantity FROM order_items WHERE order_id = ?',
+      [id]
+    );
+
+   
+    for (const item of items) {
+      await connection.query(
+        'UPDATE products SET stock = stock + ? WHERE id = ?',
+        [item.quantity, item.product_id]
+      );
+    }
+
+  
+    await connection.query(
+      "UPDATE orders SET status = 'declined' WHERE id = ?",
+      [id]
+    );
+
+    await connection.commit();
+    res.status(200).json({ message: 'تم رفض الطلب وإعادة المنتجات إلى المخزون بنجاح' });
+
+  } catch (err) {
+    await connection.rollback(); 
+    console.error('Error declining order:', err);
+    res.status(500).json({ error: 'حدث خطأ أثناء رفض الطلب', details: err.message });
+  } finally {
+    connection.release(); 
+  }
+});
 module.exports = router;
