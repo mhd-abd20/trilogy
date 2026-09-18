@@ -1,7 +1,4 @@
 const mysql = require('mysql2/promise');
-
-// config/db.js (أو المسار المعتمد لديك)
-const mysql = require('mysql2/promise');
 require('dotenv').config();
 
 const db = mysql.createPool({
