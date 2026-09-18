@@ -74,6 +74,7 @@ const Navbar = () => {
   const handleLogout = () => {
     localStorage.removeItem('userId');
     localStorage.removeItem('userRole');
+    localStorage.removeItem('trilogy_cart')
     setIsMobileMenuOpen(false);
     navigate('/');
     window.location.reload();
