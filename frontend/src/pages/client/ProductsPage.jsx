@@ -76,8 +76,26 @@ if(stock>10){
 }
   
 
+  const [quantities, setQuantities] = useState({});
+
+  const getSelectedQty = (pId) => quantities[pId] || 1;
+
+  const handleQtyChange = (pId, delta, maxStock) => {
+    setQuantities((prev) => {
+      const current = prev[pId] || 1;
+      const next = current + delta;
+      if (next < 1) return prev;
+      if (next > maxStock) {
+        alert(`عذراً، أقصى كمية متوفرة في المخزون هي ${maxStock}`);
+        return prev;
+      }
+      return { ...prev, [pId]: next };
+    });
+  };
+
   const addToCart = (product) => {
     const prodId = product.id || product.product_id;
+    const qtyToAdd = quantities[prodId] || 1;
     const effectivePrice = product.promo_price !== null && product.promo_price !== undefined
       ? Number(product.promo_price)
       : Number(product.price || product.original_price);
@@ -86,20 +104,20 @@ if(stock>10){
       const existing = prevCart.find((item) => (item.id || item.product_id) === prodId);
       const currentQty = existing ? existing.quantity : 0;
 
-      if (currentQty + 1 > product.stock_quantity) {
-        alert(`عذراً، المتوفر في المخزون فقط ${product.stock_quantity} قطعة`);
+      if (currentQty + qtyToAdd > product.stock_quantity) {
+        alert(`عذراً، المتوفر في المخزون فقط ${product.stock_quantity} قطعة (لديك بالفعل ${currentQty} في السلة)`);
         return prevCart;
       }
 
       if (existing) {
         return prevCart.map((item) =>
           (item.id || item.product_id) === prodId
-            ? { ...item, quantity: item.quantity + 1, price: effectivePrice }
+            ? { ...item, quantity: item.quantity + qtyToAdd, price: effectivePrice }
             : item
         );
       }
 
-      return [...prevCart, { ...product, id: prodId, price: effectivePrice, quantity: 1 }];
+      return [...prevCart, { ...product, id: prodId, price: effectivePrice, quantity: qtyToAdd }];
     });
   };
 
@@ -158,6 +176,7 @@ if(stock>10){
               const pId = product.id || product.product_id;
               const isOutOfStock = product.stock_quantity <= 0;
               const isInCart = cart.some((item) => (item.id || item.product_id) === pId);
+              const selectedQty = getSelectedQty(pId);
               const hasDiscount = product.promo_price !== null && product.promo_price !== undefined;
               const originalPrice = product.original_price || product.price;
 
@@ -203,7 +222,31 @@ if(stock>10){
                     )}
                   </div>
 
-                  {/* الجزء المعدل مع Inline Styles لإجبار العرض الأفقي والألوان الصريحة */}
+                  {!isOutOfStock && (
+                    <div className="card-qty-row">
+                      <span className="qty-label">الكمية:</span>
+                      <div className="card-qty-picker">
+                        <button
+                          type="button"
+                          onClick={() => handleQtyChange(pId, -1, product.stock_quantity)}
+                          disabled={selectedQty <= 1}
+                          title="تقليل الكمية"
+                        >
+                          -
+                        </button>
+                        <span className="qty-value">{selectedQty}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleQtyChange(pId, 1, product.stock_quantity)}
+                          disabled={selectedQty >= product.stock_quantity}
+                          title="زيادة الكمية"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="buttons" style={{ display: 'flex', flexDirection: 'row', gap: '8px', width: '100%', marginTop: '12px', boxSizing: 'border-box' }}>
                     <button
                       onClick={() => addToCart(product)}
@@ -225,7 +268,7 @@ if(stock>10){
                         textOverflow: 'ellipsis'
                       }}
                     >
-                      {isOutOfStock ? 'نفذت الكمية ❌' : 'إضافة للسلة 🛒'}
+                      {isOutOfStock ? 'نفذت الكمية ❌' : `إضافة (${selectedQty}) 🛒`}
                     </button>
 
                     <Link
