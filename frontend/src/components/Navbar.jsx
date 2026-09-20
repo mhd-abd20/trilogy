@@ -43,14 +43,16 @@ const Navbar = () => {
 
     window.addEventListener('storage', updateCartCount);
     window.addEventListener('cartUpdated', updateCartCount);
+    window.addEventListener('cartBadgeUpdated', updateCartCount)
 
     return () => {
       window.removeEventListener('storage', updateCartCount);
       window.removeEventListener('cartUpdated', updateCartCount);
+      window.removeEventListener('cartBadgeUpdated', updateCartCount);
     };
   }, []);
 
-  // Close mobile menu automatically on route change
+
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [location.pathname]);
