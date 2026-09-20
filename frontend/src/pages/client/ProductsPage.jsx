@@ -11,8 +11,12 @@ const Products = () => {
   const [loading, setLoading] = useState(true);
 
   const [cart, setCart] = useState(() => {
-    const saved = localStorage.getItem('trilogy_cart');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('trilogy_cart');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
   });
 
   useEffect(() => {
@@ -39,9 +43,23 @@ const Products = () => {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('trilogy_cart', JSON.stringify(cart));
-    window.dispatchEvent(new Event('cartUpdated'));
-  }, [cart]);
+    const syncCart = () => {
+      try {
+        const saved = localStorage.getItem('trilogy_cart');
+        setCart(saved ? JSON.parse(saved) : []);
+      } catch {
+        setCart([]);
+      }
+    };
+
+    window.addEventListener('cartUpdated', syncCart);
+    window.addEventListener('storage', syncCart);
+
+    return () => {
+      window.removeEventListener('cartUpdated', syncCart);
+      window.removeEventListener('storage', syncCart);
+    };
+  }, []);
 
   const getImageUrl = (imagePath) => {
     if (!imagePath) return '';
@@ -57,24 +75,24 @@ const Products = () => {
     return `${SERVER_ORIGIN}${cleanPath}`;
   };
 
-  const stockStatus = (stock)=>{
-if(stock>10){
-  return(
-    <p style={{color: "green"}}>الكمية: {stock} (متوفرة)</p>
-  )
-}
-  else if(stock<10 && stock>0){
-      return(
-    <p style={{color: "#FFD700"}}>الكمية: {stock} (كمية محدودة)</p>
-  )
+  const stockStatus = (stock) => {
+    if (stock > 10) {
+      return (
+        <p style={{ color: "green" }}>الكمية: {stock} (متوفرة)</p>
+      )
+    }
+    else if (stock < 10 && stock > 0) {
+      return (
+        <p style={{ color: "#FFD700" }}>الكمية: {stock} (كمية محدودة)</p>
+      )
+    }
+    else {
+      return (
+        <p style={{ color: "red" }}>الكمية: {stock} (غير متوفرة)</p>
+      )
+    }
   }
-  else{
-       return(
-    <p style={{color: "red"}}>الكمية: {stock} (غير متوفرة)</p>
-  )
-  }
-}
-  
+
 
   const [quantities, setQuantities] = useState({});
 
@@ -96,29 +114,47 @@ if(stock>10){
   const addToCart = (product) => {
     const prodId = product.id || product.product_id;
     const qtyToAdd = quantities[prodId] || 1;
-    const effectivePrice = product.promo_price !== null && product.promo_price !== undefined
-      ? Number(product.promo_price)
-      : Number(product.price || product.original_price);
+    const effectivePrice =
+      product.promo_price !== null && product.promo_price !== undefined
+        ? Number(product.promo_price)
+        : Number(product.price || product.original_price);
 
-    setCart((prevCart) => {
-      const existing = prevCart.find((item) => (item.id || item.product_id) === prodId);
-      const currentQty = existing ? existing.quantity : 0;
 
-      if (currentQty + qtyToAdd > product.stock_quantity) {
-        alert(`عذراً، المتوفر في المخزون فقط ${product.stock_quantity} قطعة (لديك بالفعل ${currentQty} في السلة)`);
-        return prevCart;
-      }
+    const currentCart = JSON.parse(localStorage.getItem('trilogy_cart') || '[]');
 
-      if (existing) {
-        return prevCart.map((item) =>
-          (item.id || item.product_id) === prodId
-            ? { ...item, quantity: item.quantity + qtyToAdd, price: effectivePrice }
-            : item
-        );
-      }
+    const existing = currentCart.find((item) => String(item.id || item.product_id) === String(prodId));
+    const currentQty = existing ? existing.quantity : 0;
+    const maxStock = product.stock_quantity ?? product.stock ?? Infinity;
 
-      return [...prevCart, { ...product, id: prodId, price: effectivePrice, quantity: qtyToAdd }];
-    });
+
+    if (currentQty + qtyToAdd > maxStock) {
+      alert(`عذراً، المتوفر في المخزون فقط ${maxStock} قطعة (لديك بالفعل ${currentQty} في السلة)`);
+      return;
+    }
+
+    let updatedCart;
+    if (existing) {
+      updatedCart = currentCart.map((item) =>
+        String(item.id || item.product_id) === String(prodId)
+          ? { ...item, quantity: item.quantity + qtyToAdd, price: effectivePrice }
+          : item
+      );
+    } else {
+      updatedCart = [
+        ...currentCart,
+        { ...product, id: prodId, price: effectivePrice, quantity: qtyToAdd },
+      ];
+    }
+
+    localStorage.setItem('trilogy_cart', JSON.stringify(updatedCart));
+    if (typeof setCart === 'function') {
+      setCart(updatedCart);
+    }
+
+    window.dispatchEvent(new Event('cartUpdated'));
+    window.dispatchEvent(new CustomEvent('cartBadgeUpdated'));
+
+
   };
 
   const filteredProducts = products.filter((product) => {
@@ -175,7 +211,9 @@ if(stock>10){
             filteredProducts.map((product) => {
               const pId = product.id || product.product_id;
               const isOutOfStock = product.stock_quantity <= 0;
-              const isInCart = cart.some((item) => (item.id || item.product_id) === pId);
+              const isInCart = cart.some(
+                (item) => String(item.id || item.product_id) === String(pId)
+              );
               const selectedQty = getSelectedQty(pId);
               const hasDiscount = product.promo_price !== null && product.promo_price !== undefined;
               const originalPrice = product.original_price || product.price;
@@ -204,7 +242,7 @@ if(stock>10){
 
                   <h3>{product.name || product.product_name}</h3>
 
-                 {stockStatus(product.stock_quantity)}
+                  {stockStatus(product.stock_quantity)}
                   <div className="product-price-wrapper" style={{ margin: '10px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                     {hasDiscount ? (
                       <>
