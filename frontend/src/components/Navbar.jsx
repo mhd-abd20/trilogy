@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { FaShoppingCart } from 'react-icons/fa';
 import { FiLogOut, FiLogIn, FiMenu, FiX, FiUser } from 'react-icons/fi';
+import { openCartDrawer } from '../utils/cartDrawer.js';
 import axios from 'axios';
 import ThemeToggle from './ThemeToggle.jsx';
 import '../styles/Navbar.css';
@@ -159,15 +160,19 @@ const Navbar = () => {
         <div className="nav-actions">
           <ThemeToggle />
 
-          <Link
-            to="/cart"
+          <button
+            type="button"
             className="cart-icon-wrapper"
             aria-label="سلة التسوق"
-            onClick={closeMobileMenu}
+            onClick={() => {
+              closeMobileMenu();
+              window.dispatchEvent(new Event('openCartDrawer'));
+            }}
+           
           >
             <FaShoppingCart className="cart-icon" />
             {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
-          </Link>
+          </button>
 
           {/* Desktop Auth Button */}
           <div className="desktop-auth-container">

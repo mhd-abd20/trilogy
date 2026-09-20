@@ -5,7 +5,7 @@ import HomeRedirect from './components/HomeRedirect';
 
 import Navbar from './components/Navbar';
 import AdminNavbar from './components/AdminNavbar';
-
+import CartDrawer from './components/CartDrawer'; 
 
 import CategoriesList from './pages/admin/CategoriesList';
 import PromotionsCategories from './pages/admin/PromotionsCategories';
@@ -39,7 +39,7 @@ function App() {
     <BrowserRouter>
     
       <DynamicNavbar />
-
+      
       <Routes>
        
         <Route element={<ProtectedRoute allowedRoles={["admin"]} />}> 
@@ -67,7 +67,9 @@ function App() {
           <Route path="/order-history" element={<OrderHistory />} />
         </Route>
       </Routes>
+     <CartDrawer/>
     </BrowserRouter>
+    
   );
 }
 

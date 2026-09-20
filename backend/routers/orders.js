@@ -178,7 +178,7 @@ router.post('/checkout-guest', async (req, res) => {
         finalGuestId = guestResult.insertId;
       }
 
-      // إنشاء الطلب الخاص بالزائر
+      
       const [orderResult] = await connection.query(
         `INSERT INTO orders (guest_id, total_amount, created_at) VALUES (?, ?, NOW())`,
         [finalGuestId, totalAmount]
