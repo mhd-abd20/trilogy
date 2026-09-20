@@ -53,9 +53,12 @@ const CartDrawer = () => {
     };
   }, []);
 
-  const saveCart = (newCart) => {
+const saveCart = (newCart) => {
     setCart(newCart);
     localStorage.setItem('trilogy_cart', JSON.stringify(newCart));
+
+  
+    window.dispatchEvent(new Event('cartUpdated'));
     window.dispatchEvent(new CustomEvent('cartBadgeUpdated'));
   };
 
@@ -116,7 +119,7 @@ const CartDrawer = () => {
     navigate('/guest-checkout', { state: { payload } });
   };
 
-  const handleCheckout = async () => {
+const handleCheckout = async () => {
     if (cart.length === 0) return;
     setLoading(true);
     try {
@@ -130,11 +133,9 @@ const CartDrawer = () => {
         })),
         totalAmount: totalPrice.toFixed(2),
       };
-
       await axios.post(`${SERVER_ORIGIN}/api/orders/checkout`, payload);
-
       alert('تم إرسال الطلب بنجاح وتحديث المخزون!');
-      saveCart([]);
+      saveCart([]); 
       closeDrawer();
       navigate('/products');
     } catch (err) {
@@ -143,7 +144,6 @@ const CartDrawer = () => {
       setLoading(false);
     }
   };
-
   if (!isOpen) return null;
 
   return (

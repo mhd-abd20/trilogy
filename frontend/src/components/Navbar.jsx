@@ -32,10 +32,18 @@ const Navbar = () => {
     getName();
   }, [userId]);
 
-  const updateCartCount = () => {
-    const savedCart = JSON.parse(localStorage.getItem('trilogy_cart') || '[]');
-    const totalItems = savedCart.reduce((sum, item) => sum + (item.quantity || 1), 0);
-    setCartCount(totalItems);
+const updateCartCount = () => {
+    try {
+      const savedCart = JSON.parse(localStorage.getItem('trilogy_cart') || '[]');
+      if (!Array.isArray(savedCart) || savedCart.length === 0) {
+        setCartCount(0);
+        return;
+      }
+      const totalItems = savedCart.reduce((sum, item) => sum + (Number(item.quantity) || 1), 0);
+      setCartCount(totalItems);
+    } catch {
+      setCartCount(0);
+    }
   };
 
   useEffect(() => {
