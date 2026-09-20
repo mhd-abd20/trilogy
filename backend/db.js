@@ -24,7 +24,7 @@ const db = mysql.createPool({
 
 (async () => {
   try {
-    const connection = await pool.getConnection();
+    const connection = await db.getConnection();
     console.log('✅ تم الاتصال بنجاح بقاعدة بيانات TiDB Cloud!');
     connection.release();
   } catch (err) {
