@@ -147,32 +147,44 @@ useEffect(() => {
     });
   };
 
-  const addToCart = (product) => {
+const addToCart = (product) => {
     const prodId = product.id || product.product_id;
     const qtyToAdd = quantities[prodId] || 1;
-    const effectivePrice = product.promo_price !== null && product.promo_price !== undefined
-      ? Number(product.promo_price)
-      : Number(product.price || product.original_price);
+    const effectivePrice =
+      product.promo_price !== null && product.promo_price !== undefined
+        ? Number(product.promo_price)
+        : Number(product.price || product.original_price);
+    const currentCart = JSON.parse(localStorage.getItem('trilogy_cart') || '[]');
 
-    setCart((prevCart) => {
-      const existing = prevCart.find((item) => (item.id || item.product_id) === prodId);
-      const currentQty = existing ? existing.quantity : 0;
+    const existing = currentCart.find((item) => String(item.id || item.product_id) === String(prodId));
+    const currentQty = existing ? existing.quantity : 0;
+    const maxStock = product.stock_quantity ?? product.stock ?? Infinity;
 
-      if (currentQty + qtyToAdd > product.stock_quantity) {
-        alert(`عذراً، المتوفر في المخزون فقط ${product.stock_quantity} قطعة (لديك بالفعل ${currentQty} في السلة)`);
-        return prevCart;
-      }
+    if (currentQty + qtyToAdd > maxStock) {
+      alert(`عذراً، المتوفر في المخزون فقط ${maxStock} قطعة (لديك بالفعل ${currentQty} في السلة)`);
+      return;
+    }
 
-      if (existing) {
-        return prevCart.map((item) =>
-          (item.id || item.product_id) === prodId
-            ? { ...item, quantity: item.quantity + qtyToAdd, price: effectivePrice }
-            : item
-        );
-      }
+    let updatedCart;
+    if (existing) {
+      updatedCart = currentCart.map((item) =>
+        String(item.id || item.product_id) === String(prodId)
+          ? { ...item, quantity: item.quantity + qtyToAdd, price: effectivePrice }
+          : item
+      );
+    } else {
+      updatedCart = [
+        ...currentCart,
+        { ...product, id: prodId, price: effectivePrice, quantity: qtyToAdd },
+      ];
+    }
 
-      return [...prevCart, { ...product, id: prodId, price: effectivePrice, quantity: qtyToAdd }];
-    });
+    localStorage.setItem('trilogy_cart', JSON.stringify(updatedCart));
+    setCart(updatedCart);
+
+   
+    window.dispatchEvent(new Event('cartUpdated'));
+    window.dispatchEvent(new CustomEvent('cartBadgeUpdated'));
   };
 
   const filteredProducts = products.filter((product) => {
@@ -334,7 +346,7 @@ useEffect(() => {
                 filteredProducts.map((product) => {
                   const pId = product.id || product.product_id;
                   const isOutOfStock = product.stock_quantity <= 0;
-                  const isInCart = cart.some((item) => (item.id || item.product_id) === pId);
+                  const isInCart = cart.some((item) => String(item.id || item.product_id) === String(pId));
                   const hasDiscount = product.promo_price !== null && product.promo_price !== undefined;
                   const originalPrice = product.original_price || product.price;
 
