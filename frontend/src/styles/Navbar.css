@@ -1,10 +1,7 @@
-/* ==========================================================================
-   NAVBAR STYLES - Modern, Glassmorphic & Fully Responsive (RTL)
-   ========================================================================== */
+
 
 .navbar {
-  background-color: var(--bg-card, #ffffff);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border-color, #e2e8f0);
   position: sticky;
@@ -15,7 +12,7 @@
   transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Container */
+
 .navbar-container {
   max-width: 1200px;
   margin: 0 auto;
@@ -26,7 +23,7 @@
   gap: 20px;
 }
 
-/* Brand & Logo */
+
 .navbar-brand {
   display: flex;
   align-items: center;
@@ -50,7 +47,6 @@
   opacity: 0.9;
 }
 
-/* User Welcome Pill */
 .user-welcome {
   display: inline-flex;
   align-items: center;
@@ -77,7 +73,6 @@
   display: none;
 }
 
-/* Navigation Links */
 .nav-links {
   display: flex;
   align-items: center;
@@ -96,9 +91,9 @@
   white-space: nowrap;
 }
 
-.nav-item:hover {
-  color: var(--primary-color, #2563eb);
-  background-color: rgba(37, 99, 235, 0.06);
+ .nav-item:hover {
+  color: var(--primary-color, #2563eb) !important;
+  background-color: rgba(37, 99, 235, 0.06) !important;
 }
 
 .nav-item.active {
@@ -119,7 +114,6 @@
   border-radius: 3px;
 }
 
-/* Nav Actions Container */
 .nav-actions {
   display: flex;
   align-items: center;
@@ -127,7 +121,6 @@
   flex-shrink: 0;
 }
 
-/* زر وأيقونة السلة */
 .cart-icon-wrapper {
   position: relative;
   display: inline-flex;
@@ -181,7 +174,6 @@
   100% { transform: scale(1); }
 }
 
-/* Auth Buttons */
 .desktop-auth-container {
   display: flex;
   align-items: center;
@@ -242,7 +234,6 @@
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
 }
 
-/* Mobile Toggle Hamburger Button */
 .mobile-menu-toggle {
   display: none;
   align-items: center;
@@ -268,9 +259,7 @@
   display: none;
 }
 
-/* ==========================================================================
-   RESPONSIVE MEDIA QUERIES (Mobile & Tablet)
-   ========================================================================== */
+
 
 @media (max-width: 868px) {
   .desktop-welcome {

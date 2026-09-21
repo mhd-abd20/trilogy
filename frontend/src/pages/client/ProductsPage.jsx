@@ -8,6 +8,7 @@ const Products = () => {
   const [categories, setCategories] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('ALL');
+  const [inStockOnly, setInStockOnly] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const [cart, setCart] = useState(() => {
@@ -160,10 +161,14 @@ const Products = () => {
   const filteredProducts = products.filter((product) => {
     const prodName = (product.name || product.product_name || '').toLowerCase();
     const matchesSearch = prodName.includes(searchQuery.toLowerCase());
+
     const matchesCategory =
       selectedCategory === 'ALL' ||
       String(product.category_id) === String(selectedCategory);
-    return matchesSearch && matchesCategory;
+
+    const stock = Number(product.stock_quantity ?? product.stock ?? 0);
+    const matchesStock = !inStockOnly || stock > 0;
+    return matchesSearch && matchesCategory && matchesStock;
   });
 
   const cartBadgeCount = cart.reduce((total, item) => total + item.quantity, 0);
@@ -183,6 +188,7 @@ const Products = () => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
+        
 
         <div className="category-buttons">
           <button
@@ -201,6 +207,14 @@ const Products = () => {
             </button>
           ))}
         </div>
+        <label style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', cursor: 'pointer', userSelect: 'none' }}>
+  <input
+    type="checkbox"
+    checked={inStockOnly}
+    onChange={(e) => setInStockOnly(e.target.checked)}
+  />
+  <span>عرض المتوفر في المخزون فقط</span>
+</label>
       </div>
 
       {loading ? (

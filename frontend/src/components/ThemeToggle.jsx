@@ -16,7 +16,6 @@ const ThemeToggle = () => {
     localStorage.setItem('theme', theme);
   }, [theme]);
 
-  // 3. دالة التبديل
   const toggleTheme = () => {
     setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
   };

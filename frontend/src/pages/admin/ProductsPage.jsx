@@ -12,7 +12,7 @@ import {
 import { getCategories } from '../../api/categoryService';
 
 const SERVER_ORIGIN = import.meta.env.VITE_BACKEND_URL;
-const PLACEHOLDER_IMAGE = '/placeholder.png'; // إضفاء قيمة افتراضية لتفادي أخطاء الصورة
+const PLACEHOLDER_IMAGE = '/placeholder.png'; 
 
 const getImageUrl = (imagePath) => {
   if (!imagePath) return PLACEHOLDER_IMAGE;
@@ -90,11 +90,8 @@ export default function ProductsPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // دالة التعامل مع استلام الصورة المولدة من المكون الفرعي
-  const handleImageGenerated = (generatedUrl) => {
-    setImageUrlInput(generatedUrl);
-    setImageFile(null); // إلغاء تحديد الملف اليدوي في حال توليد صورة
-  };
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();

@@ -38,8 +38,12 @@ export default function GuestCheckoutPage() {
 
       if (response.data.success) {
         alert('تم إرسال الطلب بنجاح وتحديث المخزون!');
-        localStorage.removeItem('trilogy_cart');
-        navigate('/products');
+        localStorage.setItem('trilogy_cart', JSON.stringify([]));
+
+        window.dispatchEvent(new Event('cartUpdated'));
+        window.dispatchEvent(new CustomEvent('cartBadgeUpdated'));
+
+        navigate('/');
       }
     } catch (err) {
       alert(err.response?.data?.message || 'حدث خطأ أثناء إرسال الطلب');
