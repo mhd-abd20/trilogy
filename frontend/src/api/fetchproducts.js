@@ -1,5 +1,7 @@
 import { customFetch } from './fetchClient';
+import axios from 'axios';
 
+const SERVER_ORIGIN = import.meta.env.VITE_BACKEND_URL;
 // جلب جميع المنتجات
 export const getProducts = async () => {
   return await customFetch('/products');
@@ -16,6 +18,13 @@ export const createProduct = async (formData) => {
     method: 'POST',
     body: formData,
   });
+};
+
+export const createBulkProducts = async (productsArray) => {
+  const response = await axios.post(`${SERVER_ORIGIN}/api/products/bulk`, {
+    products: productsArray
+  });
+  return response.data;
 };
 
 // تعديل منتج (يستقبل FormData للصور)

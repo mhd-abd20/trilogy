@@ -138,6 +138,63 @@ router.post('/', upload.single('image'), async (req, res) => {
 });
 
 
+// POST /api/products/bulk
+router.post('/bulk', async (req, res) => {
+  const { products } = req.body;
+
+  if (!Array.isArray(products) || products.length === 0) {
+    return res.status(400).json({ error: 'يجب إرسال مصفوفة منتجات تحتوي على عنصر واحد على الأقل.' });
+  }
+
+  // التحقق من اكتمال البيانات الأساسية لكل منتج
+  for (let i = 0; i < products.length; i++) {
+    const p = products[i];
+    if (!p.name || p.original_price === undefined || p.original_price === '' || !p.category_id) {
+      return res.status(400).json({
+        error: `المنتج رقم ${i + 1} (${p.name || 'بدون اسم'}) تنقصه بيانات إلزامية (الاسم، السعر، أو الفئة).`
+      });
+    }
+  }
+
+  const connection = await db.getConnection();
+
+  try {
+    await connection.beginTransaction();
+
+    // إعداد المصفوفة ثنائية الأبعاد لمطابقة ترتيب الأعمدة
+    const values = products.map((p) => [
+      p.name,
+      Number(p.original_price),
+      Number(p.stock_quantity) || 0,
+      p.category_id,
+      p.description || '',
+      p.image_url || null,
+      p.youtube_url || null
+    ]);
+
+    const query = `
+      INSERT INTO products (name, price, stock_quantity, category_id, description, image_url, youtube_url)
+      VALUES ?
+    `;
+
+    const [result] = await connection.query(query, [values]);
+
+    await connection.commit();
+
+    res.status(201).json({
+      message: `تمت إضافة ${result.affectedRows} منتج بنجاح!`,
+      insertedCount: result.affectedRows
+    });
+  } catch (err) {
+    await connection.rollback();
+    console.error('Bulk insert error:', err);
+    res.status(500).json({ error: err.message });
+  } finally {
+    connection.release();
+  }
+});
+
+
 router.put('/:id', upload.single('image'), async (req, res) => {
   try {
     const { id } = req.params;

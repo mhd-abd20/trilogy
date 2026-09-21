@@ -188,6 +188,7 @@
    ========================================================= */
 .products-grid {
   display: grid;
+  z-index: 1;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 22px;
 }
@@ -342,4 +343,185 @@
   color: #94a3b8;
   font-size: 1rem;
   padding: 20px 0;
+}
+.product-form-card {
+  max-width: 900px; 
+}
+
+/* =========================================================
+   النموذج فائق الضغط (Compact Multi-Row Form)
+   ========================================================= */
+.compact-form-card {
+  position: relative;
+  z-index: 20;
+  background: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 16px 20px;
+  margin-bottom: 30px;
+  box-shadow: 0 15px 25px -5px rgba(0, 0, 0, 0.3);
+}
+
+.compact-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding-bottom: 10px;
+}
+
+.compact-card-top h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  color: #818cf8;
+}
+
+.btn-add-mini-row {
+  background-color: rgba(99, 102, 241, 0.15);
+  color: #a5b4fc;
+  border: 1px solid #6366f1;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-add-mini-row:hover {
+  background-color: #6366f1;
+  color: #fff;
+}
+
+.compact-rows-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 520px; /* سكرول سلس إذا أضاف الأدمن 10 منتجات أو أكثر */
+  overflow-y: auto;
+  padding-left: 6px;
+}
+
+.compact-row-box {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 10px 12px 10px 36px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.row-counter-badge {
+  position: absolute;
+  right: 8px;
+  top: 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.compact-grid-line {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.line-1 {
+  padding-right: 20px; /* لإعطاء مساحة لرقم العداد */
+}
+
+.line-2 {
+  padding-right: 20px;
+}
+
+/* الحقول المدمجة */
+.input-compact {
+  height: 36px;
+  padding: 6px 10px;
+  font-size: 0.85rem;
+  background-color: #0b1120;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: #f8fafc;
+  box-sizing: border-box;
+}
+
+.input-compact:focus {
+  border-color: #6366f1;
+  outline: none;
+}
+
+.flex-grow { flex: 3; min-width: 140px; }
+.w-price { flex: 1; min-width: 80px; }
+.w-qty { flex: 1; min-width: 70px; }
+.w-cat { flex: 1.5; min-width: 110px; }
+.flex-1 { flex: 1; min-width: 130px; }
+
+/* أزرار الحذف والتحكم المدمجة */
+.btn-delete-row {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  height: 36px;
+  width: 36px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+}
+
+.btn-delete-row:hover {
+  background: #ef4444;
+  color: #fff;
+}
+
+.compact-image-controls {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.btn-file-label {
+  height: 36px;
+  padding: 0 12px;
+  background: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: #cbd5e1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.btn-file-label:hover {
+  background: #334155;
+}
+
+.btn-cancel-file {
+  background: none;
+  border: none;
+  color: #ef4444;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.ai-gen-wrapper {
+  max-width: 240px;
+}
+
+.compact-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
