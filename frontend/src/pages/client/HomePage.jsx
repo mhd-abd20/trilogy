@@ -20,9 +20,13 @@ const HomePage = () => {
   const sliderRef = useRef(null);
   const promoSliderRef = useRef(null);
 
-  const [cart, setCart] = useState(() => {
-    const saved = localStorage.getItem('trilogy_cart');
-    return saved ? JSON.parse(saved) : [];
+const [cart, setCart] = useState(() => {
+    try {
+      const saved = localStorage.getItem('trilogy_cart');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
   });
 
   useEffect(() => {
@@ -83,10 +87,24 @@ const HomePage = () => {
     fetchPromotions();
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem('trilogy_cart', JSON.stringify(cart));
-    window.dispatchEvent(new Event('cartUpdated'));
-  }, [cart]);
+useEffect(() => {
+    const syncCart = () => {
+      try {
+        const saved = localStorage.getItem('trilogy_cart');
+        setCart(saved ? JSON.parse(saved) : []);
+      } catch {
+        setCart([]);
+      }
+    };
+
+    window.addEventListener('cartUpdated', syncCart);
+    window.addEventListener('storage', syncCart);
+
+    return () => {
+      window.removeEventListener('cartUpdated', syncCart);
+      window.removeEventListener('storage', syncCart);
+    };
+  }, []);
 
   const getImageUrl = (imagePath) => {
     if (!imagePath) return '';
@@ -169,8 +187,7 @@ const HomePage = () => {
   const scrollSlider = (direction) => {
     if (!sliderRef.current) return;
     const scrollAmount = 300;
-    // In RTL, left arrow scrolls left (-amount) to see forward products
-    // right arrow scrolls right (+amount) to see previous products
+   
     if (direction === 'left') {
       sliderRef.current.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
     } else {
