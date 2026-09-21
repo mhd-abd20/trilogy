@@ -44,8 +44,34 @@ const upload = multer({ storage: storage });
 
 router.get('/', async (req, res) => {
   try {
+    const page = req.query.page ? parseInt(req.query.page) : null;
+    const limit = req.query.limit ? parseInt(req.query.limit) : null;
+
+    let paginationData = null;
+    let limitClause = '';
+    const queryParams = [];
+
+    // إذا تم تمرير limit (مثل 100 في صفحة المنتجات أو 10 في الرئيسية)
+    if (limit) {
+      const currentPage = page || 1;
+      const offset = (currentPage - 1) * limit;
+
+      const [countResult] = await db.query('SELECT COUNT(*) as total FROM products');
+      const total = countResult[0].total;
+
+      paginationData = {
+        total,
+        totalPages: Math.ceil(total / limit),
+        currentPage,
+        limit
+      };
+
+      limitClause = 'LIMIT ? OFFSET ?';
+      queryParams.push(limit, offset);
+    }
+
     const query = `
-SELECT 
+      SELECT 
         p.id,
         p.category_id,
         p.name,
@@ -68,10 +94,22 @@ SELECT
         INNER JOIN promotions pr ON pp.promotion_id = pr.id
         WHERE pr.is_active = 1 
           AND NOW() BETWEEN pr.start_date AND pr.end_date
-      ) AS active_promos ON p.id = active_promos.product_id;
+      ) AS active_promos ON p.id = active_promos.product_id
+      ORDER BY p.id DESC
+      ${limitClause};
     `;
-    
-    const [rows] = await db.query(query);
+
+    const [rows] = await db.query(query, queryParams);
+
+    // إذا طلب العميل pagination نرجع كائن يحتوي على المنتجات والبيانات الوصفية
+    if (paginationData) {
+      return res.json({
+        products: rows,
+        pagination: paginationData
+      });
+    }
+
+    // إذا كان استدعاء قديماً بدون بارامترات نرجع مصفوفة المنتجات كالسابق
     res.json(rows);
   } catch (err) {
     res.status(500).json({ error: err.message });

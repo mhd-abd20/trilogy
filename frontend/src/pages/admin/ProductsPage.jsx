@@ -68,21 +68,34 @@ export default function ProductsPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalProductsCount, setTotalProductsCount] = useState(0);
+
   const [formList, setFormList] = useState([{ ...initialSingleProduct }]);
   const [editId, setEditId] = useState(null);
 
   useEffect(() => {
-    loadData();
-  }, []);
+    loadData(currentPage);
+  }, [currentPage]);
 
-  const loadData = async () => {
+  const loadData = async (page = 1) => {
     setLoading(true);
     try {
-      const [productsData, categoriesData] = await Promise.all([
-        getProducts(),
+      const [productsRes, categoriesData] = await Promise.all([
+        getProducts(page, 100),
         getCategories()
       ]);
-      setProducts(productsData || []);
+
+      if (productsRes && productsRes.products) {
+        setProducts(productsRes.products);
+        setTotalPages(productsRes.pagination.totalPages);
+        setTotalProductsCount(productsRes.pagination.total);
+      } else {
+        setProducts(Array.isArray(productsRes) ? productsRes : []);
+      }
+
       setCategories(categoriesData || []);
     } catch (err) {
       console.error('خطأ أثناء جلب البيانات:', err.message);
@@ -163,8 +176,7 @@ export default function ProductsPage() {
       }
 
       resetForm();
-      const updatedProducts = await getProducts();
-      setProducts(updatedProducts);
+      loadData(currentPage);
     } catch (err) {
       alert(`خطأ: ${err.response?.data?.error || err.message}`);
     } finally {
@@ -193,7 +205,7 @@ export default function ProductsPage() {
     if (!window.confirm('هل أنت متأكد من حذف هذا المنتج؟')) return;
     try {
       await deleteProduct(id);
-      setProducts((prev) => prev.filter((p) => p.id !== id));
+      loadData(currentPage);
     } catch (err) {
       alert(`فشل الحذف: ${err.message}`);
     }
@@ -231,7 +243,6 @@ export default function ProductsPage() {
                 <div key={index} className="compact-row-box">
                   <div className="row-counter-badge">#{index + 1}</div>
 
-                  {/* السطر الأول: البيانات الأساسية المطلوبة */}
                   <div className="compact-grid-line line-1">
                     <input
                       type="text"
@@ -287,7 +298,6 @@ export default function ProductsPage() {
                     )}
                   </div>
 
-                  {/* السطر الثاني: التفاصيل الإضافية والصورة */}
                   <div className="compact-grid-line line-2">
                     <input
                       type="text"
@@ -306,7 +316,6 @@ export default function ProductsPage() {
                     />
 
                     <div className="compact-image-controls">
-                      {/* رفع من الجهاز */}
                       <label className="btn-file-label" title="رفع صورة من الجهاز">
                         📁 {item.imageFile ? 'تم الرفع ✓' : 'صورة'}
                         <input
@@ -332,7 +341,6 @@ export default function ProductsPage() {
                         </button>
                       )}
 
-                      {/* توليد الذكاء الاصطناعي مدمج */}
                       <div className="ai-gen-wrapper">
                         <ImageGeneratorInput
                           onImageSelected={(url) => {
@@ -341,7 +349,6 @@ export default function ProductsPage() {
                           }}
                           defaultImage={item.imageFile ? '' : item.image_url}
                           disabled={!!item.imageFile}
-                          
                         />
                       </div>
                     </div>
@@ -368,10 +375,49 @@ export default function ProductsPage() {
           </form>
         </div>
 
-        {/* عرض شبكة المنتجات */}
-        <div className="products-header" style={{ marginTop: '40px' }}>
-          <h2>قائمة المنتجات المتاحة</h2>
+        {/* شبكة قائمة المنتجات */}
+        <div className="products-header" style={{ marginTop: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h2>قائمة المنتجات المتاحة (إجمالي: {totalProductsCount})</h2>
         </div>
+
+        {/* أزرار التنقل بين الصفحات (Pagination) */}
+        {totalPages > 1 && (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '14px', margin: '20px 0' }}>
+            <button
+              type="button"
+              disabled={currentPage <= 1 || loading}
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              style={{
+                padding: '8px 16px',
+                backgroundColor: currentPage <= 1 ? '#1e293b' : '#6366f1',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: currentPage <= 1 ? 'not-allowed' : 'pointer'
+              }}
+            >
+              → الصفحة السابقة
+            </button>
+            <span style={{ color: '#cbd5e1' }}>
+              صفحة <strong>{currentPage}</strong> من <strong>{totalPages}</strong>
+            </span>
+            <button
+              type="button"
+              disabled={currentPage >= totalPages || loading}
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              style={{
+                padding: '8px 16px',
+                backgroundColor: currentPage >= totalPages ? '#1e293b' : '#6366f1',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: currentPage >= totalPages ? 'not-allowed' : 'pointer'
+              }}
+            >
+              الصفحة التالية ←
+            </button>
+          </div>
+        )}
 
         {loading ? (
           <p className="loading-text">جاري تحميل البيانات...</p>

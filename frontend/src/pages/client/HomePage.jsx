@@ -30,24 +30,32 @@ const [cart, setCart] = useState(() => {
   });
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const [prodRes, catRes] = await Promise.all([
-          axios.get(`${SERVER_ORIGIN}/api/products`),
-          axios.get(`${SERVER_ORIGIN}/api/categories`)
-        ]);
+// داخل useEffect الخاص بالـ HomePage.jsx:
+const fetchData = async () => {
+  try {
+    setLoading(true);
+    const [prodRes, catRes] = await Promise.all([
+     
+      axios.get(`${SERVER_ORIGIN}/api/products?page=1&limit=10`),
+      axios.get(`${SERVER_ORIGIN}/api/categories`)
+    ]);
 
-        setProducts(Array.isArray(prodRes.data) ? prodRes.data : []);
-        setCategories(Array.isArray(catRes.data) ? catRes.data : []);
-      } catch (err) {
-        console.error("خطأ في جلب بيانات المنتجات في الصفحة الرئيسية:", err);
-        setProducts([]);
-        setCategories([]);
-      } finally {
-        setLoading(false);
-      }
-    };
+   
+    if (prodRes.data && prodRes.data.products) {
+      setProducts(prodRes.data.products);
+    } else {
+      setProducts(Array.isArray(prodRes.data) ? prodRes.data : []);
+    }
+
+    setCategories(Array.isArray(catRes.data) ? catRes.data : []);
+  } catch (err) {
+    console.error("خطأ في جلب بيانات المنتجات في الصفحة الرئيسية:", err);
+    setProducts([]);
+    setCategories([]);
+  } finally {
+    setLoading(false);
+  }
+};
 
     const fetchPromotions = async () => {
       try {

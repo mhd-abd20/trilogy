@@ -3,8 +3,8 @@ import axios from 'axios';
 
 const SERVER_ORIGIN = import.meta.env.VITE_BACKEND_URL;
 // جلب جميع المنتجات
-export const getProducts = async () => {
-  return await customFetch('/products');
+export const getProducts = async (page = 1, limit = 100) => {
+  return await customFetch(`/products?page=${page}&limit=${limit}`);
 };
 
 // جلب منتج حسب الـ ID
