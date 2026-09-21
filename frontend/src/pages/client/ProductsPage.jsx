@@ -190,7 +190,9 @@ const Products = () => {
           >
             الكل
           </button>
-          {categories.map((cat) => (
+          {categories
+          .filter((cat) => Number(cat.is_active) === 1)
+          .map((cat) => (
             <button
               key={cat.id}
               className={`cat-btn ${selectedCategory === String(cat.id) ? 'active' : ''}`}

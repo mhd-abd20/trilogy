@@ -316,7 +316,9 @@ const addToCart = (product) => {
             >
               الكل ({products.length})
             </button>
-            {categories.map((cat) => {
+            {categories
+            .filter((cat) => Number(cat.is_active) === 1)
+            .map((cat) => {
               const count = products.filter(p => String(p.category_id) === String(cat.id)).length;
               return (
                 <button
