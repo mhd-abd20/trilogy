@@ -26,13 +26,25 @@ const Products = () => {
       return [];
     }
   });
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedCategory, inStockOnly]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
+
+        const queryParams = new URLSearchParams({
+          page: currentPage,
+          limit: 100,
+          search: searchQuery,
+          category_id: selectedCategory,
+          in_stock: inStockOnly
+        });
+
         const [prodRes, catRes] = await Promise.all([
-          axios.get(`${SERVER_ORIGIN}/api/products?page=${currentPage}&limit=100`),
+          axios.get(`${SERVER_ORIGIN}/api/products?${queryParams.toString()}`),
           axios.get(`${SERVER_ORIGIN}/api/categories`)
         ]);
 
@@ -48,14 +60,17 @@ const Products = () => {
       } catch (err) {
         console.error("خطأ في جلب البيانات:", err);
         setProducts([]);
-        setCategories([]);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
-  }, [currentPage]);
+    const delayTimer = setTimeout(() => {
+      fetchData();
+    }, 350);
+
+    return () => clearTimeout(delayTimer);
+  }, [currentPage, searchQuery, selectedCategory, inStockOnly]);
 
   useEffect(() => {
     const syncCart = () => {
@@ -155,18 +170,6 @@ const Products = () => {
     window.dispatchEvent(new CustomEvent('cartBadgeUpdated'));
   };
 
-  const filteredProducts = products.filter((product) => {
-    const prodName = (product.name || product.product_name || '').toLowerCase();
-    const matchesSearch = prodName.includes(searchQuery.toLowerCase());
-
-    const matchesCategory =
-      selectedCategory === 'ALL' ||
-      String(product.category_id) === String(selectedCategory);
-
-    const stock = Number(product.stock_quantity ?? product.stock ?? 0);
-    const matchesStock = !inStockOnly || stock > 0;
-    return matchesSearch && matchesCategory && matchesStock;
-  });
 
   return (
     <div className="products-container">
@@ -191,16 +194,16 @@ const Products = () => {
             الكل
           </button>
           {categories
-          .filter((cat) => Number(cat.is_active) === 1)
-          .map((cat) => (
-            <button
-              key={cat.id}
-              className={`cat-btn ${selectedCategory === String(cat.id) ? 'active' : ''}`}
-              onClick={() => setSelectedCategory(String(cat.id))}
-            >
-              {cat.name}
-            </button>
-          ))}
+            .filter((cat) => Number(cat.is_active) === 1)
+            .map((cat) => (
+              <button
+                key={cat.id}
+                className={`cat-btn ${selectedCategory === String(cat.id) ? 'active' : ''}`}
+                onClick={() => setSelectedCategory(String(cat.id))}
+              >
+                {cat.name}
+              </button>
+            ))}
         </div>
 
         <label style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', cursor: 'pointer', userSelect: 'none' }}>
@@ -218,8 +221,8 @@ const Products = () => {
       ) : (
         <>
           <div className="products-grid">
-            {filteredProducts.length > 0 ? (
-              filteredProducts.map((product) => {
+            {products.length > 0 ? (
+              products.map((product) => {
                 const pId = product.id || product.product_id;
                 const isOutOfStock = product.stock_quantity <= 0;
                 const isInCart = cart.some(

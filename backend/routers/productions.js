@@ -44,30 +44,51 @@ const upload = multer({ storage: storage });
 
 router.get('/', async (req, res) => {
   try {
-    const page = req.query.page ? parseInt(req.query.page) : null;
+    const page = req.query.page ? parseInt(req.query.page) : 1;
     const limit = req.query.limit ? parseInt(req.query.limit) : null;
+    const search = req.query.search ? req.query.search.trim() : '';
+    const categoryId = req.query.category_id && req.query.category_id !== 'ALL' ? req.query.category_id : null;
+    const inStockOnly = req.query.in_stock === 'true';
+
+    const whereConditions = [];
+    const queryParams = [];
+
+    if (search) {
+      whereConditions.push('p.name LIKE ?');
+      queryParams.push(`%${search}%`);
+    }
+
+    if (categoryId) {
+      whereConditions.push('p.category_id = ?');
+      queryParams.push(categoryId);
+    }
+
+    if (inStockOnly) {
+      whereConditions.push('p.stock_quantity > 0');
+    }
+
+    const whereClause = whereConditions.length > 0 
+      ? 'WHERE ' + whereConditions.join(' AND ') 
+      : '';
 
     let paginationData = null;
     let limitClause = '';
-    const queryParams = [];
 
-    // إذا تم تمرير limit (مثل 100 في صفحة المنتجات أو 10 في الرئيسية)
     if (limit) {
-      const currentPage = page || 1;
-      const offset = (currentPage - 1) * limit;
-
-      const [countResult] = await db.query('SELECT COUNT(*) as total FROM products');
+      const countSql = `SELECT COUNT(*) as total FROM products p ${whereClause}`;
+      const [countResult] = await db.query(countSql, queryParams);
       const total = countResult[0].total;
+
+      const offset = (page - 1) * limit;
 
       paginationData = {
         total,
-        totalPages: Math.ceil(total / limit),
-        currentPage,
+        totalPages: Math.ceil(total / limit) || 1,
+        currentPage: page,
         limit
       };
 
       limitClause = 'LIMIT ? OFFSET ?';
-      queryParams.push(limit, offset);
     }
 
     const query = `
@@ -95,13 +116,14 @@ router.get('/', async (req, res) => {
         WHERE pr.is_active = 1 
           AND NOW() BETWEEN pr.start_date AND pr.end_date
       ) AS active_promos ON p.id = active_promos.product_id
+      ${whereClause}
       ORDER BY p.id DESC
       ${limitClause};
     `;
 
-    const [rows] = await db.query(query, queryParams);
+    const finalParams = limit ? [...queryParams, limit, (page - 1) * limit] : queryParams;
+    const [rows] = await db.query(query, finalParams);
 
-    // إذا طلب العميل pagination نرجع كائن يحتوي على المنتجات والبيانات الوصفية
     if (paginationData) {
       return res.json({
         products: rows,
@@ -109,9 +131,9 @@ router.get('/', async (req, res) => {
       });
     }
 
-    // إذا كان استدعاء قديماً بدون بارامترات نرجع مصفوفة المنتجات كالسابق
     res.json(rows);
   } catch (err) {
+    console.error('Error fetching products:', err);
     res.status(500).json({ error: err.message });
   }
 });
