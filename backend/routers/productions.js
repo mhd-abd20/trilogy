@@ -106,6 +106,7 @@ router.get('/', async (req, res) => {
         active_promos.discount_percentage,
         active_promos.title AS promotion_title
       FROM products p
+      LEFT JOIN categories c ON p.category_id = c.id
       LEFT JOIN (
         SELECT 
           pp.product_id, 
