@@ -19,16 +19,23 @@ const Promotions = () => {
   const [discounts, setDiscounts] = useState({});
   const [selectedCategory, setSelectedCategory] = useState("all");
 
-  useEffect(() => {
+useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         const [promoProductsData, allProductsData] = await Promise.all([
           getPromotions_id(id),
-          getProducts()
+          getProducts(1, 1000) 
         ]);
-        setProducts(promoProductsData || []);
-        setAllProducts(allProductsData || []);
+
+        setProducts(Array.isArray(promoProductsData) ? promoProductsData : (promoProductsData?.products || []));
+        if (allProductsData && Array.isArray(allProductsData.products)) {
+          setAllProducts(allProductsData.products);
+        } else if (Array.isArray(allProductsData)) {
+          setAllProducts(allProductsData);
+        } else {
+          setAllProducts([]);
+        }
       } catch (err) {
         setError(err.message);
       } finally {

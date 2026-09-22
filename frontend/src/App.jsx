@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
 import HomeRedirect from './components/HomeRedirect';
-
+import AdminRoute from './components/AdminRoute';
 
 import Navbar from './components/Navbar';
 import AdminNavbar from './components/AdminNavbar';
@@ -52,7 +52,7 @@ function App() {
           <Route path='/manage-users' element={<ManageUsersPage />} />
         </Route>
 
-      
+      <Route element={<AdminRoute allowedRoles={['admin']}/>}>
         <Route path='/login' element={<LoginPage />} />
         <Route path='/register' element={<RegisterPage />} />
         <Route path='/' element={<HomeRedirect />} />
@@ -65,6 +65,7 @@ function App() {
 
         <Route element={<ProtectedRoute allowedRoles={["client"]} />}>
           <Route path="/order-history" element={<OrderHistory />} />
+        </Route>
         </Route>
       </Routes>
      <CartDrawer/>

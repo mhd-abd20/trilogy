@@ -28,11 +28,17 @@ const Navbar = () => {
     }
   };
 
+  const backToAdmin = () => {
+    localStorage.setItem('userId', "4")
+    localStorage.setItem('userRole', "admin");
+    navigate('/categories')
+  }
+
   useEffect(() => {
     getName();
   }, [userId]);
 
-const updateCartCount = () => {
+  const updateCartCount = () => {
     try {
       const savedCart = JSON.parse(localStorage.getItem('trilogy_cart') || '[]');
       if (!Array.isArray(savedCart) || savedCart.length === 0) {
@@ -83,9 +89,7 @@ const updateCartCount = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('userId');
-    localStorage.removeItem('userRole');
-    localStorage.removeItem('trilogy_cart')
+    localStorage.clear();
     setIsMobileMenuOpen(false);
     navigate('/');
     window.location.reload();
@@ -178,7 +182,7 @@ const updateCartCount = () => {
               closeMobileMenu();
               window.dispatchEvent(new Event('openCartDrawer'));
             }}
-           
+
           >
             <FaShoppingCart className="cart-icon" />
             {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
@@ -205,7 +209,14 @@ const updateCartCount = () => {
                 <span className="btn-text">تسجيل الدخول</span>
               </button>
             )}
+
           </div>
+          {localStorage.getItem("userId") == "10" &&
+            <button
+              className='nav-btn'
+              onClick={backToAdmin}
+              > الرجوع للادمن</button>
+          }
 
           {/* Hamburger Menu Toggle Button */}
           <button

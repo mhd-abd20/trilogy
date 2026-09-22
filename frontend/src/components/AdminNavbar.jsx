@@ -16,6 +16,11 @@ export default function AdminNavbar() {
     setIsMenuOpen(false);
     navigate('/login', { replace: true });
   };
+  const asClient = () =>{
+    localStorage.setItem("userId" , "10")
+    localStorage.setItem('userRole', "client");
+    navigate("/")
+  }
 
   const toggleMenu = () => {
     setIsMenuOpen(prev => !prev);
@@ -107,12 +112,19 @@ export default function AdminNavbar() {
               </NavLink>
               
             </li>
+            <li>
+               <button className='nav-item' style={{backgroundColor: "rgba(15, 23, 42, 0.95)" , border: " none"}}
+               onClick={asClient}>
+            الدخول كزبون
+          </button>
+            </li>
           </ul>
 
           <button onClick={handleLogout} className="btn-logout">
             <FiLogOut className="logout-icon" />
             <span>تسجيل الخروج</span>
           </button>
+         
         </div>
       </div>
     </nav>

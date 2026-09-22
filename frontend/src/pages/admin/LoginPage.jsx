@@ -11,6 +11,7 @@ const LoginPage = () => {
   });
   const [error, setError] = useState('');
 
+
   const handlesubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -26,7 +27,6 @@ const LoginPage = () => {
       }
     } catch (err) {
       setError(err.message);
-      
     }
   };
 

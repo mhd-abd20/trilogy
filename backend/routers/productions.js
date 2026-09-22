@@ -95,6 +95,7 @@ router.get('/', async (req, res) => {
       SELECT 
         p.id,
         p.category_id,
+        c.name AS cname,
         p.name,
         p.description,
         p.price AS original_price,
